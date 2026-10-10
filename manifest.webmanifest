@@ -1,0 +1,16 @@
+{
+  "name": "撲克賽程雷達",
+  "short_name": "撲克雷達",
+  "description": "台灣撲克協會錦標賽一次看：手續費、保底人數、預估 ROI 與今日推薦。",
+  "lang": "zh-Hant-TW",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F3F1EA",
+  "theme_color": "#0E6A4A",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

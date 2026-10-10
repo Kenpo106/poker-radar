@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="台灣撲克協會錦標賽一次看：手續費、保底人數、預估 ROI 與今日推薦。">
+<meta name="theme-color" content="#0E6A4A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="撲克雷達">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>撲克賽程雷達</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+[hidden]{display:none!important}
+/* Layout: one-column card-room board — data status strip, "today's picks" rail, filters, compact ranked tickets that expand for detail */
+:root{
+  --bg:#EEF2EF; --surface:#FFFFFF; --sunk:#E2E8E4; --fg:#13201A; --muted:#5A6B62; --line:#CBD5CF;
+  --felt:#0E6A4A; --felt-ink:#FFFFFF; --gold:#A86C12; --good:#13804F; --bad:#B4372C;
+  --seg-prize:#0E6A4A; --seg-bounty:#C98A26; --seg-fee:#B4372C; --seg-unk:#9AA7A0;
+  --wk:#C0392B; --wk-bg:#F8E1DE; --hol:#C0392B; --hol-bg:#F8E1DE;
+  --f-display:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+/* Palettes (viewer's choice): light values here; dark values after the base dark blocks */
+:root[data-palette="gold"]{--bg:#F2F0EB;--sunk:#E7E3D9;--line:#D3CCBC;--felt:#1F1B16;--felt-ink:#F0C75E;--gold:#9A6B12;--seg-prize:#6E5320;--seg-bounty:#C98A26}
+:root[data-palette="red"]{--bg:#F6EFEF;--sunk:#EADDDD;--line:#D8C3C3;--felt:#A3242F;--felt-ink:#FFFFFF;--gold:#7A4E0E;--seg-prize:#A3242F;--seg-fee:#5F6B7A}
+:root[data-palette="blue"]{--bg:#EEF1F6;--sunk:#E0E6EF;--line:#C7D0DE;--felt:#1F4E96;--felt-ink:#FFFFFF;--gold:#A3591B;--seg-prize:#1F4E96}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1512; --surface:#15211C; --sunk:#0A110E; --fg:#E6EEE9; --muted:#93A69B; --line:#27372F;
+  --felt:#2FA477; --felt-ink:#04140D; --gold:#E0A84A; --good:#4CC48A; --bad:#E2685C;
+  --seg-prize:#2FA477; --seg-bounty:#E0A84A; --seg-fee:#E2685C; --seg-unk:#55665D; --wk:#F08A7E; --wk-bg:#3A1C1A; --hol:#F08A7E; --hol-bg:#3A1C1A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1512; --surface:#15211C; --sunk:#0A110E; --fg:#E6EEE9; --muted:#93A69B; --line:#27372F;
+  --felt:#2FA477; --felt-ink:#04140D; --gold:#E0A84A; --good:#4CC48A; --bad:#E2685C;
+  --seg-prize:#2FA477; --seg-bounty:#E0A84A; --seg-fee:#E2685C; --seg-unk:#55665D; --wk:#F08A7E; --wk-bg:#3A1C1A; --hol:#F08A7E; --hol-bg:#3A1C1A; color-scheme:dark}
+
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"])[data-palette="gold"]{--bg:#0E0C09;--surface:#1A1712;--sunk:#090806;--line:#332C21;--fg:#F1EBDD;--muted:#A89C84;--felt:#E0B54A;--felt-ink:#1A1408;--gold:#F0C75E;--seg-prize:#C9A040;--seg-bounty:#8C7A5A}
+  :root:not([data-theme="light"])[data-palette="red"]{--bg:#140C0D;--surface:#1F1314;--sunk:#0D0808;--line:#3A2527;--felt:#E2525C;--felt-ink:#1A0507;--gold:#E8B04F;--seg-prize:#E2525C;--seg-fee:#8E9AAB}
+  :root:not([data-theme="light"])[data-palette="blue"]{--bg:#0B111B;--surface:#131C2A;--sunk:#070B12;--line:#24324A;--felt:#5B8FE0;--felt-ink:#06101F;--gold:#E8A65A;--seg-prize:#5B8FE0}
+}
+:root[data-theme="dark"][data-palette="gold"]{--bg:#0E0C09;--surface:#1A1712;--sunk:#090806;--line:#332C21;--fg:#F1EBDD;--muted:#A89C84;--felt:#E0B54A;--felt-ink:#1A1408;--gold:#F0C75E;--seg-prize:#C9A040;--seg-bounty:#8C7A5A}
+:root[data-theme="dark"][data-palette="red"]{--bg:#140C0D;--surface:#1F1314;--sunk:#0D0808;--line:#3A2527;--felt:#E2525C;--felt-ink:#1A0507;--gold:#E8B04F;--seg-prize:#E2525C;--seg-fee:#8E9AAB}
+:root[data-theme="dark"][data-palette="blue"]{--bg:#0B111B;--surface:#131C2A;--sunk:#070B12;--line:#24324A;--felt:#5B8FE0;--felt-ink:#06101F;--gold:#E8A65A;--seg-prize:#5B8FE0}
+
+*{box-sizing:border-box}
+.head-tools{display:flex;gap:8px;align-items:center}
+/* view switch */
+.vs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--sunk);border-radius:10px;padding:3px;gap:3px}
+.vs button{border:0;background:none;color:var(--muted);font:inherit;font-size:14px;font-weight:700;padding:9px 0;border-radius:8px;cursor:pointer}
+.vs button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.sel select:disabled{opacity:.45;cursor:not-allowed}
+/* agenda */
+.aday{display:flex;flex-direction:column;gap:6px}
+.aday-h{display:flex;justify-content:space-between;align-items:baseline;padding:6px 2px 0;border-bottom:1px solid var(--line);font-size:14px}
+.aday-h span{font-size:12px;color:var(--muted)}
+.aday-b{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.arow-wrap+.arow-wrap{border-top:1px solid var(--line)}
+.arow-wrap.past{opacity:.55}
+.arow-wrap.flash{box-shadow:inset 0 0 0 2px var(--gold)}
+.arow{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto 4.2em;gap:10px;align-items:center;width:100%;padding:10px 12px;background:none;border:0;color:inherit;text-align:left;cursor:pointer;font:inherit}
+.arow:hover{background:var(--bg)}
+.a-time{font-weight:700;font-size:15px}
+.a-mid{display:flex;flex-direction:column;min-width:0}
+.a-name{font-weight:700;font-size:14px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.a-venue{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.a-money{display:flex;flex-direction:column;align-items:flex-end;font-size:12px}
+.a-buy{font-weight:700;font-size:13px}
+.a-gtd{color:var(--gold);font-weight:700}
+.a-chip{justify-self:end;font-size:12px;font-weight:700;border-radius:6px;padding:3px 6px;background:var(--sunk);text-align:center;min-width:3.6em}
+.a-chip.good{color:var(--good)} .a-chip.bad{color:var(--bad)} .a-chip.dim{color:var(--muted);font-weight:500}
+/* calendar */
+.cal{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.cal-nav{display:flex;justify-content:space-between;align-items:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal-wd{text-align:center;font-size:11px;color:var(--muted);padding-bottom:2px}
+.cal-wd.wk{color:var(--wk);font-weight:700}
+.cal-cell.wk{background:var(--wk-bg)}
+.cal-cell.wk .cal-d{color:var(--wk)}
+.cal-cell.hol{background:var(--hol-bg)}
+.cal-cell.hol .cal-d{color:var(--hol)}
+.cal-h{font-size:9px;line-height:1.1;color:var(--hol);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.cal-cell.picked .cal-d,.cal-cell.picked .cal-h{color:var(--felt-ink)}
+.cal-legend{display:flex;gap:12px;font-size:11px;color:var(--muted);flex-wrap:wrap}
+.cal-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.ph-left{display:flex;align-items:center;gap:10px}
+.pt{display:flex;background:var(--sunk);border-radius:8px;padding:2px;gap:2px}
+.pt button{border:0;background:none;color:var(--muted);font:inherit;font-size:13px;font-weight:700;padding:5px 14px;border-radius:6px;cursor:pointer}
+.pt button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.cal-cell{min-height:58px;border-radius:8px;border:1px solid transparent;background:var(--bg);color:var(--fg);display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 2px;font:inherit;cursor:pointer;min-width:0}
+.cal-cell.blank{background:none;cursor:default}
+.cal-cell.past{opacity:.5}
+.cal-cell.has{background:var(--sunk)}
+.cal-cell.today{border-color:var(--felt)}
+.cal-cell.picked{background:var(--felt);color:var(--felt-ink);opacity:1}
+.cal-cell.picked .cal-g,.cal-cell.picked .cal-n{color:var(--felt-ink)}
+.cal-cell.wk:not(.picked){background:var(--wk-bg)}
+.cal-cell.hol:not(.picked){background:var(--hol-bg)}
+.cal-cell.has.wk:not(.picked),.cal-cell.has.hol:not(.picked){box-shadow:inset 0 0 0 1px var(--line)}
+.cal-d{font-family:var(--f-num);font-weight:700;font-size:14px}
+.cal-n{font-size:10px;color:var(--muted);white-space:nowrap}
+.cal-g{font-size:10px;color:var(--gold);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+@media (max-width:420px){.arow{grid-template-columns:3.3em minmax(0,1fr) auto 3.4em;gap:8px;padding:9px 10px}.a-chip{min-width:0;padding:3px 4px}.cal-cell{min-height:50px}}
+.swatches{display:flex;gap:6px}
+.sw{width:22px;height:22px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--fg)}
+.sw[data-p="felt"]{background:linear-gradient(135deg,#0E6A4A 50%,#2FA477 50%)}
+.sw[data-p="gold"]{background:linear-gradient(135deg,#1F1B16 50%,#E0B54A 50%)}
+.sw[data-p="red"]{background:linear-gradient(135deg,#A3242F 50%,#E2525C 50%)}
+.sw[data-p="blue"]{background:linear-gradient(135deg,#1F4E96 50%,#5B8FE0 50%)}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 96px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.wrap>.fold{margin-top:4px}
+header{padding-top:max(14px,env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:2px}
+h1{font-family:var(--f-display);font-weight:900;font-size:24px;margin:0;letter-spacing:.02em;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:900;font-size:16px;margin:0}
+.sub,.note{color:var(--muted);font-size:13px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+button{font:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* data status */
+.status-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.src{flex:none;display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12px;color:var(--muted)}
+.src b{color:var(--fg);font-weight:700}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--good)}
+.dot.stale{background:var(--gold)} .dot.old{background:var(--bad)}
+
+/* picks */
+.picks{display:flex;flex-direction:column;gap:8px}
+.picks-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pick-row{display:flex;flex-direction:column;gap:8px}
+.hero{background:var(--felt);color:var(--felt-ink);border:0;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px;text-align:left;cursor:pointer;width:100%;font:inherit}
+.h-badge{align-self:flex-start;background:var(--gold);color:#2A1E05;font-size:11.5px;font-weight:900;border-radius:6px;padding:2px 8px;margin-bottom:2px}
+.h-when{font-size:12px;opacity:.85}
+.h-name{font-size:19px;font-weight:900;line-height:1.3}
+.h-meter{position:relative;height:10px;border-radius:6px;background:rgba(255,255,255,.2);margin-top:8px}
+.h-meter i{position:absolute;inset:0 auto 0 0;border-radius:6px;background:var(--gold)}
+.h-meter u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--felt-ink)}
+.h-ml{display:flex;justify-content:space-between;font-size:11.5px;opacity:.85}
+.h-why{font-size:13.5px;line-height:1.6;margin:6px 0 2px}
+.h-kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:6px}
+.h-kv>span{background:rgba(255,255,255,.12);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;min-width:0}
+.h-kv small{font-size:10.5px;opacity:.8}
+.h-kv b{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h-kv b.up{color:#BFF0D4}
+.h-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.h-tag{font-size:11.5px;border-radius:999px;padding:2px 9px;background:rgba(255,255,255,.14)}
+.h-tag.y{background:rgba(243,201,105,.3)}.h-tag.r{background:rgba(255,140,120,.3)}
+.alt{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;width:100%;font:inherit;color:var(--fg)}
+.alt-n{font-weight:900;font-size:16px;color:var(--felt);width:1.1em;text-align:center}
+.alt-l{display:flex;flex-direction:column;min-width:0}
+.alt-name{font-weight:700;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alt-sub{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alt-r{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+.alt-r b{font-size:12px;color:var(--felt)}
+.alt-r span{font-size:11.5px;color:var(--muted);white-space:nowrap}
+
+/* controls */
+.controls{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px}
+.controls .sel{grid-column:span 2}.controls .sel.c3{grid-column:span 3}
+@media (min-width:640px){.controls{grid-template-columns:repeat(6,minmax(0,1fr))}.controls .sel,.controls .sel.c3{grid-column:auto}}
+.row{display:flex;gap:6px;align-items:center}
+.sel{position:relative;display:flex;flex-direction:column;min-width:0}
+.sel span{position:absolute;left:10px;top:4px;font-size:10px;color:var(--muted);letter-spacing:.06em;pointer-events:none}
+.sel select{appearance:none;-webkit-appearance:none;width:100%;min-height:44px;font:inherit;font-size:16px;font-weight:700;color:var(--fg);background-color:var(--bg);border:1px solid var(--line);border-radius:10px;padding:16px 22px 3px 9px;white-space:nowrap;overflow:hidden;cursor:pointer;text-overflow:ellipsis;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 13px) 55%,calc(100% - 8px) 55%;background-size:5px 5px;background-repeat:no-repeat}
+.sel.on select{border-color:var(--felt);box-shadow:inset 0 0 0 1px var(--felt)}
+.reset{grid-column:1/-1;border:0;background:none;color:var(--felt);font:inherit;font-size:13px;font-weight:700;cursor:pointer;justify-self:end;padding:2px 4px;min-height:28px}
+
+/* tickets */
+.list{display:flex;flex-direction:column;gap:10px}
+.ticket,.arow-wrap{scroll-margin-top:16px}
+.ticket{background:var(--surface);border:1px solid var(--line);border-radius:14px;min-width:0;overflow:hidden}
+.ticket.past{opacity:.6}
+.ticket.flash{box-shadow:0 0 0 2px var(--gold)}
+.t-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;padding:12px 14px 8px;cursor:pointer;background:none;border:0;color:inherit;text-align:left;width:100%}
+.when{text-align:center;border-right:1px dashed var(--line);padding-right:12px;min-width:56px}
+.when .d{font-size:12px;color:var(--muted)}
+.when .rc{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap}
+.tag.live{border-color:var(--good);color:var(--good);font-weight:700}
+.a-time small{display:block;white-space:nowrap;letter-spacing:-.02em;font-size:10px;font-weight:500;color:var(--muted);line-height:1.2}
+.a-time small.live{color:var(--good);font-weight:700}
+.when .t{font-family:var(--f-num);font-weight:700;font-size:18px;line-height:1.2}
+.what{min-width:0;display:flex;flex-direction:column;gap:2px}
+.venue{font-size:12px;color:var(--muted)}
+.name{font-weight:700;font-size:16px;line-height:1.35}
+.gtd{font-size:13px;color:var(--gold);font-weight:700}
+.tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
+.tag{font-size:11px;border-radius:4px;padding:1px 6px;border:1px solid var(--line);color:var(--muted)}
+.tag.warn{border-color:var(--bad);color:var(--bad)}
+
+.mini{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line)}
+.mini div{padding:6px 8px;display:flex;flex-direction:column;min-width:0}
+.mini div+div{border-left:1px solid var(--line)}
+.mini .k{font-size:11px;color:var(--muted)}
+.mini .v{font-family:var(--f-num);font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v.good{color:var(--good)} .v.bad{color:var(--bad)} .v.dim{color:var(--muted);font-weight:500;font-size:12px}
+.v small{font-family:var(--f-body);font-weight:500;font-size:10px;color:var(--muted);margin-left:2px}
+
+.detail{border-top:1px solid var(--line);padding:12px 14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.bar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--sunk)}
+.bar span{display:block;height:100%}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.field{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--muted);min-width:0}
+.field input{width:100%;font-family:var(--f-num);font-weight:700;font-size:16px;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.field .hint{font-size:11px}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:12px;border-radius:6px;padding:2px 8px}
+.pill.warn{border:1px solid var(--bad);color:var(--bad)}
+.pill.perk{border:1px solid var(--gold);color:var(--gold)}
+dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:0;font-size:13px}
+dt{color:var(--muted)} dd{margin:0}
+
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:24px;text-align:center;color:var(--muted)}
+.venues{display:flex;flex-direction:column;gap:8px}
+.vcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:13px}
+.vcard ul{margin:6px 0 0;padding-left:18px;color:var(--muted)}
+details.fold{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+details.fold>summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 16px;min-height:48px;cursor:pointer;font-family:var(--f-display);font-weight:900;font-size:15px;color:var(--fg)}
+details.fold>summary::-webkit-details-marker{display:none}
+.chev{width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin-top:-4px;transition:transform .2s}
+details.fold[open] .chev{transform:rotate(-135deg);margin-top:4px}
+.fold-body{padding:0 12px 12px;display:flex;flex-direction:column;gap:10px}
+details.how p{margin:0 16px 10px}
+details.fold .vcard{background:var(--bg)}
+
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--felt);color:var(--felt-ink);border:0;border-radius:999px;padding:12px 18px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:10}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:15}
+.sheet{position:fixed;inset:auto 0 0 0;max-height:88%;overflow:auto;background:var(--surface);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;flex-direction:column;gap:10px}
+.sheet textarea{width:100%;min-height:110px;font:inherit;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px}
+.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;background:var(--felt);color:var(--felt-ink)}
+.btn.ghost{background:var(--sunk);color:var(--fg)}
+.btn:disabled{opacity:.5;cursor:default}
+.parsed{display:flex;flex-direction:column;gap:6px}
+.parsed label{display:flex;gap:8px;align-items:flex-start;background:var(--bg);border-radius:8px;padding:8px;font-size:13px}
+.toast{font-size:13px;color:var(--muted)}
+.head-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.btn.small{padding:6px 12px;font-size:13px}
+.admin{max-height:92%;gap:16px}
+.a-block{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.a-title{font-weight:900;font-size:15px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.cchip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:999px;padding:3px 4px 3px 10px;font-size:13px;background:var(--bg)}
+.cchip button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:0 4px}
+.admin select,.admin input[type=text]{font:inherit;font-size:14px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:7px 8px;min-width:0}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.form .field input,.form .field select{width:100%;font-weight:500;font-family:var(--f-body)}
+.vlist{display:flex;flex-direction:column;gap:6px}
+.vrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;background:var(--bg);border-radius:10px;padding:8px 10px}
+.vrow.off{opacity:.6}
+.vrow .vn{font-weight:700;font-size:14px}
+.vrow .vm{font-size:12px;color:var(--muted)}
+.vrow .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.pill-s{font-size:11px;border-radius:4px;padding:1px 6px;margin-left:6px;border:1px solid var(--line);color:var(--muted);font-weight:500}
+.pill-s.on{border-color:var(--good);color:var(--good)}
+.btn.warn{background:transparent;color:var(--bad);border:1px solid var(--bad)}
+@media (prefers-reduced-motion:no-preference){.ticket{transition:box-shadow .3s,opacity .2s}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="head-row"><h1>撲克賽程雷達</h1>
+      <div class="head-tools">
+        <div class="swatches" role="group" aria-label="配色">
+          <button class="sw" type="button" data-p="felt" title="牌桌綠" aria-label="牌桌綠"></button>
+          <button class="sw" type="button" data-p="gold" title="午夜金" aria-label="午夜金"></button>
+          <button class="sw" type="button" data-p="red" title="紅心" aria-label="紅心"></button>
+          <button class="sw" type="button" data-p="blue" title="籌碼藍" aria-label="籌碼藍"></button>
+        </div>
+        <button class="btn ghost small" id="openAdmin" type="button" hidden>管理協會</button>
+      </div>
+    </div>
+    <div class="sub">各協會賽程一次看，算好手續費、保底人數和預估 ROI。</div>
+  </header>
+
+  <section class="controls" aria-label="篩選">
+    <label class="sel c3"><span>縣市</span><select id="f-city"></select></label>
+    <label class="sel c3"><span>場館</span><select id="f-venue"></select></label>
+    <label class="sel c3"><span>日期</span><select id="f-date"></select></label>
+    <label class="sel c3"><span>買入</span><select id="f-buy"></select></label>
+    <label class="sel c3"><span>類型</span><select id="f-type"></select></label>
+    <label class="sel c3"><span>排序</span><select id="f-sort"></select></label>
+    <button class="reset" id="f-reset" type="button" hidden>清除篩選</button>
+  </section>
+
+  <section class="picks" aria-labelledby="picksTitle">
+    <div class="picks-head"><div class="ph-left"><h2 id="picksTitle">推薦</h2><div class="pt" role="group" aria-label="推薦日期"><button type="button" data-d="today">今天</button><button type="button" data-d="tomorrow">明天</button></div></div><span class="note" id="picksWhy"></span></div>
+    <div class="pick-row" id="picks"></div>
+  </section>
+
+  <div class="vs" role="group" aria-label="顯示方式">
+    <button type="button" data-v="cards">卡片</button>
+    <button type="button" data-v="cal">日曆</button>
+    <button type="button" data-v="agenda">清單</button>
+  </div>
+  <div class="list" id="list"><div class="empty">正在讀取賽程…</div></div>
+
+  <details class="fold how note">
+    <summary><span>數字怎麼算的</span><span class="chev" aria-hidden="true"></span></summary>
+    <p><b>保底人數</b>：保證獎池 ÷ 每人進獎池的金額。實際報名（含重買）少於這個數，主辦要補錢，這部分叫 Overlay，對玩家是正 EV。</p>
+    <p><b>預估 ROI</b>：假設你是平均水準的玩家，在預估人數下，每買入一次期望拿回多少。沒有 Overlay 時，ROI 就是負的手續費比例。賞金視為平均拿回。</p>
+    <p><b>預估人數</b>：你填的優先；沒填就用同場館、同賽事過去實際人數的平均（卡片上標「歷史」）。賽事結束後，在卡片裡填實際人數，之後的預估會越來越準。</p>
+    <p>iPhone、門票這類實物獎品沒有現金價值，要自己填估值。早鳥折扣沒有算進去。</p>
+  </details>
+
+  <details class="fold">
+    <summary><span>場館須知與資料更新</span><span class="chev" aria-hidden="true"></span></summary>
+    <div class="fold-body">
+      <div class="status-strip" id="status" aria-label="資料狀態"></div>
+      <div class="venues" id="venues"></div>
+    </div>
+  </details>
+</div>
+
+<button class="fab" id="fab" type="button" hidden>＋ 貼新賽程</button>
+<div class="scrim" id="scrim" hidden></div>
+<section class="sheet" id="sheet" hidden aria-label="新增賽程">
+  <b>貼 IG 貼文或海報</b>
+  <div class="note">貼上貼文文字，或選海報截圖，Claude 會抽出賽事資料讓你確認。</div>
+  <textarea id="postText" placeholder="例：ipc.pokercenter&#10;10/12 18:00 迷你百倍賽 保證獎池60,000 BUY$600(450+150)…"></textarea>
+  <input type="file" id="postImg" accept="image/*" multiple hidden>
+  <div class="row"><button class="btn ghost" id="pickImg" type="button" hidden>選海報圖片</button><span class="toast" id="imgName"></span></div>
+  <div class="row"><button class="btn" id="parseBtn" type="button">交給 Claude 解析</button><button class="btn ghost" id="closeSheet" type="button">關閉</button></div>
+  <div class="toast" id="parseStatus"></div>
+  <div class="parsed" id="parsed"></div>
+  <button class="btn" id="saveParsed" type="button" hidden>加入勾選的賽事</button>
+</section>
+
+<section class="sheet admin" id="admin" hidden aria-label="管理協會">
+  <div class="head-row"><b>管理協會</b><button class="btn ghost small" id="closeAdmin" type="button">關閉</button></div>
+
+  <div class="a-block">
+    <div class="a-title">自動搜尋的縣市</div>
+    <div class="note">每日排程每週會在這些縣市的 IG 搜尋新協會。</div>
+    <div class="chips" id="cityChips"></div>
+    <div class="row"><select id="addCitySel"></select><button class="btn small" id="addCity" type="button">加入</button></div>
+  </div>
+
+  <div class="a-block">
+    <div class="a-title">協會清單</div>
+    <div class="note">停業或不想看的協會按「停用」：賽事會從頁面隱藏，排程也不再讀它，之後搜尋也不會再加回來。</div>
+    <div class="vlist" id="vlist"></div>
+  </div>
+
+  <div class="a-block">
+    <div class="a-title">新增協會</div>
+    <div class="form">
+      <label class="field">名稱<input id="nv-name" type="text" placeholder="例：TYPE 鈦普牌競協會 台中站前館"></label>
+      <label class="field">IG 帳號<input id="nv-handle" type="text" placeholder="例：type.tc.station（不用加 @）"></label>
+      <label class="field">縣市<select id="nv-city"></select></label>
+      <label class="field">地址（選填）<input id="nv-addr" type="text"></label>
+    </div>
+    <button class="btn" id="nv-save" type="button">新增</button>
+    <div class="toast" id="nv-msg"></div>
+  </div>
+</section>
+
+<script>
+/* Public build: read-only data from data/*.json instead of the Claude artifact database. */
+(function(){
+  const listeners = [];
+  const cache = {};
+  async function load(name){
+    const r = await fetch('data/' + name + '.json?t=' + Math.floor(Date.now()/60000), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }
+  function snapOf(arr){ return { docs: arr.map(d => ({ id: d.id, data: () => { const o = { ...d }; delete o.id; return o; } })) }; }
+  async function refresh(){
+    for (const l of listeners){
+      try {
+        const data = await load(l.name);
+        const key = JSON.stringify(data);
+        if (cache[l.key] === key) continue;
+        cache[l.key] = key;
+        l.cb(l.kind === 'col' ? snapOf(data) : { exists: !!data, data: () => data || {} });
+      } catch(e){ if (l.err) l.err(e); }
+    }
+  }
+  const ro = () => Promise.reject(new Error('公開版不能修改資料'));
+  const db = {
+    collection(name){ return {
+      onSnapshot(cb, err){ listeners.push({ kind:'col', name, key:'c:'+name, cb, err }); refresh(); return () => {}; },
+      doc(){ return { update: ro, set: ro, delete: ro }; }
+    }; },
+    doc(path){ const name = path.split('/')[0]; return {
+      onSnapshot(cb, err){ listeners.push({ kind:'doc', name, key:'d:'+path, cb, err }); refresh(); return () => {}; },
+      update: ro, set: ro
+    }; }
+  };
+  window.claude = { use: async (k) => k === 'db' ? db : k === 'user' ? { canEdit: async () => false } : null };
+  setInterval(refresh, 10*60*1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+})();
+</script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const store = {
+    get(k, d){ try{ const v = localStorage.getItem(k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
+    set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  };
+  const WD = ['日','一','二','三','四','五','六'];
+  // Taiwan government calendar (人事行政總處 115/116 年辦公日曆表；兩年皆無補班)
+  const HOLIDAYS = {
+    '2026-01-01':'元旦','2026-02-14':'春節連假','2026-02-15':'小年夜','2026-02-16':'除夕','2026-02-17':'春節','2026-02-18':'春節','2026-02-19':'春節','2026-02-20':'春節補假','2026-02-21':'春節連假','2026-02-22':'春節連假',
+    '2026-02-27':'228補假','2026-02-28':'和平紀念日','2026-04-03':'兒童節補假','2026-04-04':'兒童節','2026-04-05':'清明節','2026-04-06':'清明補假','2026-05-01':'勞動節',
+    '2026-06-19':'端午節','2026-09-25':'中秋節','2026-09-28':'教師節','2026-10-09':'國慶補假','2026-10-10':'國慶日','2026-10-25':'光復節','2026-10-26':'光復節補假','2026-12-25':'行憲紀念日',
+    '2027-01-01':'元旦','2027-02-04':'小年夜','2027-02-05':'除夕','2027-02-06':'春節','2027-02-07':'春節','2027-02-08':'春節','2027-02-09':'春節補假','2027-02-10':'春節補假',
+    '2027-02-28':'和平紀念日','2027-03-01':'228補假','2027-04-04':'兒童節','2027-04-05':'清明節','2027-04-06':'兒童節補假','2027-04-30':'勞動節補假','2027-05-01':'勞動節',
+    '2027-06-09':'端午節','2027-09-15':'中秋節','2027-09-28':'教師節','2027-10-10':'國慶日','2027-10-11':'國慶補假','2027-10-25':'光復節','2027-12-24':'行憲補假','2027-12-25':'行憲紀念日','2027-12-31':'元旦補假'
+  };
+  const holidayOf = d => HOLIDAYS[d] || '';
+  const dowOf = d => { const [y,m,dd] = d.split('-').map(Number); return new Date(Date.UTC(y,m-1,dd)).getUTCDay(); };
+  let events = [], venues = [], db = null;
+  let rawEvents = [], allVenues = [], settings = { cities: [] }, settingsVer = false;
+  function recompute(){
+    const hidden = new Set(allVenues.filter(v => v.inactive).flatMap(v => [v.name, ...(v.aliases||[])]));
+    events = rawEvents.filter(e => !hidden.has(e.venue));
+    venues = allVenues.filter(v => !v.inactive);
+  }
+  const DEFAULTS = { city:'all', venue:'all', date:'upcoming', buy:'all', type:'all', sort:'smart' };
+  const state = {}; Object.keys(DEFAULTS).forEach(k => state[k] = store.get('f_'+k, DEFAULTS[k]));
+  state.picksDay = store.get('f_picksDay', 'today');
+  state.view = store.get('f_view', 'cards'); if (!['cards','cal','agenda'].includes(state.view)) state.view = 'cards';
+  // Taiwan's 22 counties/cities, north to south, for the region menu
+  const CITIES = ['基隆','台北','新北','桃園','新竹市','新竹縣','苗栗','台中','彰化','南投','雲林','嘉義市','嘉義縣','台南','高雄','屏東','宜蘭','花蓮','台東','澎湖','金門','連江'];
+  let entries = store.get('entries', {});
+  let extras  = store.get('extras', {});
+  const open = new Set();
+
+  // ---------- palette (per viewer) ----------
+  function applyPalette(p){
+    if (p && p !== 'felt') document.documentElement.dataset.palette = p; else delete document.documentElement.dataset.palette;
+    document.querySelectorAll('.sw').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.p === (p||'felt'))));
+  }
+  applyPalette(store.get('palette','felt'));
+  document.querySelectorAll('.sw').forEach(b => b.onclick = () => { store.set('palette', b.dataset.p); applyPalette(b.dataset.p); });
+
+  // ---------- who can edit (owner / editors) ----------
+  let canEdit = false;
+  const editReady = (async () => { try { const u = await window.claude?.use?.('user'); return u ? !!(await u.canEdit()) : false; } catch(e){ return false; } })();
+
+  const fmt = n => n==null||isNaN(n) ? '—' : Math.round(n).toLocaleString('zh-TW');
+  const pct = n => n==null||isNaN(n) ? '—' : (n*100).toFixed(1)+'%';
+  const startOf = e => new Date(`${e.date}T${e.time||'00:00'}:00+08:00`);
+  const dayKey = d => new Date(d.getTime()+8*3600e3).toISOString().slice(0,10);
+  // 截買時間：優先用 e.regClose（HH:MM），否則從 lateReg 抓最後一個 HH:MM；早於開賽時間代表跨日
+  function regCloseOf(e){
+    const src = e.regClose || e.lateReg || '';
+    const m = [...String(src).matchAll(/(\d{1,2})[:：](\d{2})/g)].pop();
+    if (!m) return null;
+    const hh = String(Math.min(23, Number(m[1]))).padStart(2,'0'), mm = m[2];
+    let d = new Date(`${e.date}T${hh}:${mm}:00+08:00`);
+    if (d < startOf(e)) d = new Date(d.getTime()+864e5);
+    return d;
+  }
+  const hhmm = d => new Date(d.getTime()+8*3600e3).toISOString().slice(11,16);
+  // 沒有截買時間時，開賽 1 小時後視為結束
+  const endOf = e => regCloseOf(e) || new Date(startOf(e).getTime()+60*60e3);
+  const isPast = e => endOf(e) < new Date();
+  const isLive = e => { const n = new Date(); return startOf(e) <= n && !isPast(e); };
+  const el = (tag, cls, text) => { const n=document.createElement(tag); if(cls) n.className=cls; if(text!=null) n.textContent=text; return n; };
+
+  function types(e){
+    const t = [], txt = (e.name||'')+(e.gtdText||'');
+    if (e.gtd) t.push('gtd');
+    if ((e.bounty||0)>0 || /bounty|獵人|賞金|k\.?o/i.test(e.name||'')) t.push('bounty');
+    if (/門票|衛星/.test(txt)) t.push('sat');
+    if (e.nonCash && /iphone|ipad|airpods|手機/i.test(txt)) t.push('prize');
+    return t;
+  }
+  const TYPE_LABEL = { gtd:'保證賽', bounty:'賞金賽', sat:'衛星／門票', prize:'實物獎品' };
+
+  function histN(e){
+    const done = events.filter(x => x.id!==e.id && x.venue===e.venue && Number(x.actualEntries)>0);
+    const same = done.filter(x => x.name===e.name);
+    const pool = same.length ? same : done.filter(x => x.time===e.time && (x.buyIn===e.buyIn));
+    if (!pool.length) return null;
+    return { n: Math.round(pool.reduce((s,x)=>s+Number(x.actualEntries),0)/pool.length), k: pool.length };
+  }
+
+  function calc(e){
+    const buy = e.buyIn, fee = e.fee, prize = e.prize;
+    const feePct = (buy && fee!=null) ? fee/buy : null;
+    const gtdTotal = (e.gtd||0) + (Number(extras[e.id])||0);
+    const be = (gtdTotal>0 && prize) ? gtdTotal/prize : null;
+    let n = Number(entries[e.id])||0, nSrc = n ? 'you' : null;
+    if (!n){ const h = histN(e); if (h){ n = h.n; nSrc = 'hist'; } }
+    let roi = null, overlay = null;
+    if (buy && prize!=null && fee!=null){
+      const bounty = e.bounty!=null ? e.bounty : Math.max(0, buy-fee-prize);
+      if (n>0){ overlay = Math.max(0, gtdTotal - n*prize); roi = (Math.max(gtdTotal, n*prize)/n + bounty)/buy - 1; }
+      else if (!gtdTotal) roi = -feePct;
+    }
+    return { feePct, gtdTotal, be, n, nSrc, roi, overlay };
+  }
+
+  // ---------- controls ----------
+  const venueOf = e => venues.find(v => v.name===e.venue || (v.aliases||[]).includes(e.venue));
+  const cityOf = e => e.city || venueOf(e)?.city || '未分類';
+  const inPlace = e => (state.city==='all' || cityOf(e)===state.city) && (state.venue==='all' || e.venue===state.venue);
+
+  function fill(sel, groups, key){
+    sel.innerHTML='';
+    groups.forEach(g => {
+      const parent = g.label ? Object.assign(document.createElement('optgroup'), { label: g.label }) : sel;
+      g.items.forEach(([v,label]) => { const o = document.createElement('option'); o.value=v; o.textContent=label; parent.append(o); });
+      if (g.label) sel.append(parent);
+    });
+    if (![...sel.options].some(o => o.value===state[key])){ state[key]=DEFAULTS[key]; store.set('f_'+key, state[key]); }
+    sel.value = state[key];
+    sel.parentElement.classList.toggle('on', state[key]!==DEFAULTS[key]);
+    sel.onchange = () => {
+      state[key] = sel.value; store.set('f_'+key, sel.value);
+      if (key==='city'){ state.venue='all'; store.set('f_venue','all'); }
+      renderAll();
+    };
+  }
+  function renderControls(){
+    const count = {}; events.forEach(e => { const c = cityOf(e); (count[c] ||= new Set()).add(e.venue); });
+    const withData = CITIES.filter(c => count[c]).concat(Object.keys(count).filter(c => !CITIES.includes(c)));
+    const groups = [{ items: [['all','全部縣市']].concat(withData.map(c => [c, `${c}（${count[c].size} 間）`])) }];
+    const empty = CITIES.filter(c => !count[c]);
+    if (empty.length) groups.push({ label:'尚無場館資料', items: empty.map(c => [c,c]) });
+    fill($('#f-city'), groups, 'city');
+
+    const vs = [...new Set(events.filter(e => state.city==='all' || cityOf(e)===state.city).map(e => e.venue))];
+    fill($('#f-venue'), [{ items: [['all', state.city==='all' ? '全部場館' : `${state.city}全部場館`]].concat(vs.map(v => [v,v])) }], 'venue');
+    fill($('#f-date'), [{ items: [['upcoming','即將開賽'],['today','今天'],['tomorrow','明天'],['week','7 天內'],['all','全部（含已結束）']] }], 'date');
+    $('#f-date').disabled = state.view === 'cal'; $('#f-date').title = state.view === 'cal' ? '日曆模式直接點日期' : '';
+    fill($('#f-buy'), [{ items: [['all','不限金額'],['1000','1,000 以下'],['2000','2,000 以下'],['3000','3,000 以下'],['5000','5,000 以下'],['10000','10,000 以下'],['over','10,000 以上']] }], 'buy');
+    fill($('#f-type'), [{ items: [['all','全部類型'],['gtd','保證賽'],['bounty','賞金賽'],['sat','衛星／門票'],['prize','實物獎品']] }], 'type');
+    fill($('#f-sort'), [{ items: [['smart','綜合推薦'],['roi','預估 ROI'],['be','保底人數'],['fee','手續費'],['time','開賽時間']] }], 'sort');
+    $('#f-reset').hidden = Object.keys(DEFAULTS).every(k => state[k]===DEFAULTS[k]);
+  }
+  $('#f-reset').onclick = () => { Object.keys(DEFAULTS).forEach(k => { state[k]=DEFAULTS[k]; store.set('f_'+k, DEFAULTS[k]); }); renderAll(); };
+
+  function buyOk(e){ if (state.buy==='all') return true; const b = e.buyIn; if (b==null) return false; return state.buy==='over' ? b>10000 : b<=Number(state.buy); }
+  function filtered(ignoreDate){
+    const now = new Date(), today = dayKey(now), tmr = dayKey(new Date(now.getTime()+864e5));
+    return events.filter(e => {
+      if (!inPlace(e)) return false;
+      if (state.type!=='all' && !types(e).includes(state.type)) return false;
+      if (!buyOk(e)) return false;
+      if (ignoreDate || state.date==='all') return true;
+      if (state.date==='today') return e.date===today;
+      if (state.date==='tomorrow') return e.date===tmr;
+      if (isPast(e)) return false;
+      if (state.date==='week') return startOf(e) <= new Date(now.getTime()+7*864e5);
+      return true;
+    });
+  }
+  const nz = (v, dir) => v==null ? Infinity : v*dir;
+  function smartKey(c){ // ROI when known, otherwise ease of overlay, otherwise fee
+    if (c.roi!=null && c.n) return -c.roi*1000;
+    if (c.be) return 100 + c.be/10;
+    return 1000 + (c.feePct??1)*100;
+  }
+  function sorted(list){
+    const arr = list.map(e => ({ e, c: calc(e) }));
+    arr.sort((a,b) => {
+      const t = startOf(a.e)-startOf(b.e);
+      if (state.sort==='time') return t;
+      if (state.sort==='fee') return nz(a.c.feePct,1)-nz(b.c.feePct,1) || t;
+      if (state.sort==='be') return nz(a.c.be,1)-nz(b.c.be,1) || t;
+      if (state.sort==='roi') return nz(a.c.roi,-1)-nz(b.c.roi,-1) || t;
+      return smartKey(a.c)-smartKey(b.c) || t;
+    });
+    return arr;
+  }
+
+  // ---------- status + picks ----------
+  function renderStatus(){
+    const box = $('#status'); box.innerHTML='';
+    const vs = venues.filter(v => state.city==='all' || v.city===state.city);
+    if (!vs.length){ box.append(el('span','note', state.city==='all' ? '尚無場館資料' : `${state.city}還沒有場館資料`)); return; }
+    vs.forEach(v => {
+      const s = el('span','src'); const d = el('span','dot');
+      const age = v.updated ? (Date.now()-new Date(v.updated).getTime())/864e5 : 99;
+      if (age>7) d.classList.add('old'); else if (age>2) d.classList.add('stale');
+      const when = v.updated ? new Date(v.updated).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric',timeZone:'Asia/Taipei'}) : '未知';
+      s.append(d, el('b',null,v.name), `${v.sourceLabel||'手動'}・${when} 更新`);
+      box.append(s);
+    });
+  }
+  // 推薦理由：回傳 { badge, line, tags[], meter }
+  function pickReason(e, c, pool){
+    const dayWord = e.date===dayKey(new Date()) ? '今天' : '明天';
+    const money = n => '$'+fmt(n);
+    const tags = [];
+    const feeAvg = (() => { const f = pool.map(x => calc(x).feePct).filter(v => v!=null); return f.length ? f.reduce((a,b)=>a+b,0)/f.length : null; })();
+    if (c.feePct!=null && feeAvg!=null && pool.length>1 && feeAvg - c.feePct >= 0.03) tags.push({t:`抽水比今天平均低 ${Math.round((feeAvg-c.feePct)*100)}%`, k:'g'});
+    if (e.stack && e.buyIn && e.stack/e.buyIn >= 40) tags.push({t:`深籌 ${wan(e.stack)}`, k:'g'});
+    if (e.gtd && e.buyIn && e.gtd/e.buyIn >= 150) tags.push({t:`保證是買入的 ${Math.round(e.gtd/e.buyIn)} 倍`, k:'g'});
+    if (e.bounty) tags.push({t:`賞金 ${money(e.bounty)}`, k:''});
+    if (e.champ) tags.push({t:`保證冠軍 ${money(e.champ)}`, k:''});
+    const rc = regCloseOf(e);
+    if (rc){ const left = (rc - new Date())/60e3; if (left>0 && left<=180) tags.push({t: left<60 ? `截買剩 ${Math.round(left)} 分` : `截買剩 ${(left/60).toFixed(1).replace(/\.0$/,'')} 小時`, k:'y'}); }
+    if ((e.uncertain||[]).length) tags.push({t:`${e.uncertain.length} 項待確認`, k:'r'});
+    const be = c.be ? Math.ceil(c.be) : null;
+    const nTxt = c.nSrc==='you' ? '你預估' : '過去平均';
+    if (c.n && be){
+      const meter = { n: c.n, be, label: nTxt };
+      if (c.overlay > 0){
+        const per = c.overlay / c.n / e.buyIn;
+        return { badge: c.roi>0 ? '正 EV・有 Overlay' : 'Overlay 機會', short:`Overlay 約 ${wan(Math.round(c.overlay/100)*100)}`, line:`${nTxt} ${c.n} 人，比保底 ${be} 人少 ${be-c.n} 人。主辦大約要補 ${money(Math.round(c.overlay/100)*100)} 進獎池，等於每個買入多拿 ${Math.round(per*100)}%，${c.roi>0 ? '扣掉手續費還是正 EV。' : `能抵掉一部分手續費（手續費 ${pct(c.feePct)}）。`}`, tags, meter };
+      }
+      return { badge: c.feePct!=null && c.feePct<=0.15 ? '低抽水' : '人數穩定', short: c.feePct!=null ? `抽水 ${pct(c.feePct)}` : `${c.n} 人`, line:`${nTxt} ${c.n} 人，已經超過保底 ${be} 人，不太會有 Overlay；${c.feePct!=null ? `主要看抽水 ${pct(c.feePct)}，` : ''}預估 ROI ${pct(c.roi)}。`, tags, meter };
+    }
+    if (be){
+      const gPool = pool.map(x => ({x, c: calc(x)})).filter(o => o.c.be);
+      const rankBe = gPool.filter(o => Math.ceil(o.c.be) < be).length + 1;
+      const maxG = Math.max(...gPool.map(o => o.x.gtd||0));
+      const minFee = Math.min(...gPool.map(o => o.c.feePct ?? 1));
+      const many = gPool.length > 1;
+      let badge = rankBe===1 ? '保底門檻最低' : `保底第 ${rankBe} 低`, why = many ? (rankBe===1 ? `是${dayWord} ${gPool.length} 場保證賽裡門檻最低的` : `在${dayWord} ${gPool.length} 場保證賽裡排第 ${rankBe} 低`) : '';
+      if (many && rankBe>1 && e.gtd===maxG){ badge = '保證最大'; why = `保證 ${wan(e.gtd)} 是${dayWord}最大的`; }
+      else if (many && rankBe>1 && c.feePct!=null && c.feePct===minFee){ badge = '抽水最低'; why = `抽水 ${pct(c.feePct)} 是${dayWord}保證賽裡最低的`; }
+      return { badge, short:`保底 ${be} 人`, line:`報名少於 ${be} 人就有 Overlay${why ? '，'+why : ''}。還沒有這場的歷史人數，點進去填入預估人數就能算出 ROI。`, tags, meter:null };
+    }
+    return { badge: c.feePct!=null && c.feePct<=0.15 ? '低抽水' : '無保證', short: c.feePct!=null ? `抽水 ${pct(c.feePct)}` : '—', line:`沒有保證獎池，獎池完全看報名人數${c.feePct!=null ? `；抽水 ${pct(c.feePct)}` : ''}。`, tags, meter:null };
+  }
+
+  function goToEvent(e){
+    open.add(e.id); calDay = e.date; calMonth = e.date.slice(0,7);
+    if (state.view !== 'cal' && !filtered().some(x => x.id === e.id)){ state.date='upcoming'; state.type='all'; state.venue='all'; state.buy='all'; }
+    renderAll();
+    const t = document.getElementById('t-'+e.id); if (t){ t.scrollIntoView({behavior:'smooth',block:'center'}); t.classList.add('flash'); setTimeout(()=>t.classList.remove('flash'),1500); }
+  }
+
+  function renderPicks(){
+    const box = $('#picks'); box.innerHTML='';
+    const now = new Date(), today = dayKey(now), tmr = dayKey(new Date(now.getTime()+864e5));
+    const target = state.picksDay==='tomorrow' ? tmr : today;
+    document.querySelectorAll('.pt button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.d === (state.picksDay||'today'))));
+    const pool = events.filter(e => e.date===target && !isPast(e) && e.prize!=null && inPlace(e) && buyOk(e));
+    const ranked = pool.map(e=>({e,c:calc(e)})).sort((a,b)=>smartKey(a.c)-smartKey(b.c)).slice(0,3);
+    const anyN = ranked.some(r => r.c.n);
+    $('#picksWhy').textContent = ranked.length ? '點卡片看詳情' : '';
+    if (!ranked.length){ box.append(el('div','empty', state.city!=='all' && !events.some(e => cityOf(e)===state.city) ? `${state.city}還沒有賽事資料。` : `${target===today?'今天':'明天'}${holidayOf(target)?'（'+holidayOf(target)+'）':''}沒有${state.buy!=='all'?'符合買入條件、':''}還能報名、可計算的賽事。`)); return; }
+    const whenTxt = e => { const rc = regCloseOf(e); return `${e.time}${isLive(e)?' 開賽中':''}${rc?'・截買 '+hhmm(rc):''}`; };
+
+    // 首選大卡
+    const { e, c } = ranked[0], R = pickReason(e, c, pool);
+    const h = el('button','hero'); h.type='button';
+    h.append(el('span','h-badge', (target===today?'今日首選':'明日首選')+'・'+R.badge));
+    h.append(el('span','h-when', `${whenTxt(e)}・${e.venue}`), el('span','h-name', e.name));
+    if (R.meter){
+      const m = el('span','h-meter'); const fill = el('i'); fill.style.width = Math.min(100, R.meter.n/R.meter.be*100)+'%';
+      m.append(fill); if (R.meter.n > R.meter.be){ const u = el('u'); u.style.left = (R.meter.be/R.meter.n*100)+'%'; m.append(u); fill.style.width='100%'; }
+      const ml = el('span','h-ml'); ml.append(el('span',null,`${R.meter.label} ${R.meter.n} 人`), el('span',null,`保底 ${R.meter.be} 人`));
+      h.append(m, ml);
+    }
+    h.append(el('span','h-why', R.line));
+    const kv = el('span','h-kv');
+    const k = (label, v, cls) => { const d = el('span'); d.append(el('small',null,label), el('b','num'+(cls?' '+cls:''), v)); kv.append(d); };
+    k('買入', e.buyIn ? '$'+fmt(e.buyIn) : '—');
+    k('手續費', pct(c.feePct));
+    if (c.roi!=null && c.n) k('預估 ROI', (c.roi>0?'+':'')+pct(c.roi), c.roi>0?'up':'');
+    else k('保證獎池', e.gtd ? wan(e.gtd) : '—');
+    h.append(kv);
+    if (R.tags.length){ const tg = el('span','h-tags'); R.tags.slice(0,4).forEach(t => tg.append(el('span','h-tag '+t.k, t.t))); h.append(tg); }
+    h.onclick = () => goToEvent(e);
+    box.append(h);
+
+    // 其他選擇
+    ranked.slice(1).forEach(({e,c}, i) => {
+      const r = pickReason(e, c, pool);
+      const row = el('button','alt'); row.type='button';
+      const l = el('span','alt-l'); l.append(el('span','alt-name', e.name), el('span','alt-sub', `${whenTxt(e)}・${e.venue}・${e.buyIn?'$'+fmt(e.buyIn):'—'}`));
+      const rr = el('span','alt-r'); rr.append(el('b',null,r.badge), el('span',null,r.short));
+      row.append(el('span','alt-n num', String(i+2)), l, rr);
+      row.onclick = () => goToEvent(e);
+      box.append(row);
+    });
+  }
+
+  // ---------- tickets ----------
+  function numField(label, id, val, ph, hint, onSave){
+    const f = el('label','field'); f.append(label);
+    const i = document.createElement('input'); i.type='number'; i.inputMode='numeric'; i.min='0'; i.id=id; i.placeholder=ph; i.value = val ?? '';
+    i.onchange = () => onSave(i.value);
+    f.append(i); if (hint) f.append(el('span','hint',hint)); return f;
+  }
+  function ticket({e,c}){
+    const t = el('article','ticket'+(isPast(e)?' past':'')); t.id = 't-'+e.id;
+    const head = el('button','t-head'); head.type='button'; head.setAttribute('aria-expanded', String(open.has(e.id)));
+    const [yy,mm,dd] = e.date.split('-').map(Number);
+    const when = el('div','when');
+    when.append(el('div','d', `${mm}/${dd}（${WD[new Date(Date.UTC(yy,mm-1,dd)).getUTCDay()]}）`), el('div','t', e.time||'—'));
+    { const rc = regCloseOf(e); if (rc) when.append(el('div','rc', '截買 '+hhmm(rc))); }
+    const what = el('div','what');
+    what.append(el('div','venue', e.venue), el('div','name', e.name));
+    if (e.gtdText) what.append(el('div','gtd', e.gtdText));
+    const tags = el('div','tags'); if (isLive(e)) tags.append(el('span','tag live','開賽中・可報名')); types(e).forEach(k => tags.append(el('span','tag', TYPE_LABEL[k])));
+    if ((e.uncertain||[]).length) tags.append(el('span','tag warn', `${e.uncertain.length} 項待確認`));
+    if (tags.childNodes.length) what.append(tags);
+    head.append(when, what);
+    head.onclick = () => { open.has(e.id) ? open.delete(e.id) : open.add(e.id); renderList(); };
+    t.append(head);
+
+    const mini = el('div','mini');
+    const cell = (k, v, cls, small) => { const d = el('div'); const vv = el('span','v num'+(cls?' '+cls:''), v); if (small) vv.append(el('small',null,small)); d.append(el('span','k',k), vv); mini.append(d); };
+    cell('買入', e.buyIn ? '$'+fmt(e.buyIn) : '—');
+    cell('手續費', pct(c.feePct), c.feePct>0.22 ? 'bad' : '');
+    cell('保底', c.be ? Math.ceil(c.be)+'人' : '—');
+    if (c.roi!=null) cell('預估 ROI', (c.roi>0?'+':'')+pct(c.roi), c.roi>0?'good':'bad', c.nSrc==='hist'?'歷史':'');
+    else cell('預估 ROI', '展開填人數', 'dim');
+    t.append(mini);
+
+    if (open.has(e.id)) t.append(detail(e,c));
+    return t;
+  }
+  function detail(e,c){
+    const d = el('div','detail');
+    if (e.buyIn){
+      const bar = el('div','bar'); bar.setAttribute('role','img');
+      const leg = el('div','legend');
+      let known = 0;
+      [['進獎池',e.prize,'--seg-prize'],['賞金',e.bounty,'--seg-bounty'],['手續費',e.fee,'--seg-fee']].forEach(([label,v,col]) => {
+        if (v==null) return; known += v; if (!v) return;
+        const s = el('span'); s.style.width=(v/e.buyIn*100)+'%'; s.style.background=`var(${col})`; bar.append(s);
+        const l = el('span'); const i = el('i'); i.style.background=`var(${col})`; l.append(i, `${label} ${fmt(v)}`); leg.append(l);
+      });
+      const unk = e.buyIn - known;
+      if (unk>0){ const s=el('span'); s.style.width=(unk/e.buyIn*100)+'%'; s.style.background='var(--seg-unk)'; bar.append(s);
+        const l=el('span'); const i=el('i'); i.style.background='var(--seg-unk)'; l.append(i, `未拆分 ${fmt(unk)}`); leg.append(l); }
+      bar.setAttribute('aria-label', leg.textContent);
+      d.append(bar, leg);
+    }
+    const inputs = el('div','inputs');
+    const h = histN(e);
+    inputs.append(numField('預估報名（含重買）', 'n-'+e.id, entries[e.id], h ? `歷史平均 ${h.n}` : '例 120', h ? `過去 ${h.k} 場平均 ${h.n} 人` : null,
+      v => { entries[e.id]=v; store.set('entries',entries); renderAll(); }));
+    if (e.nonCash) inputs.append(numField('實物獎品估值', 'x-'+e.id, extras[e.id], '自填金額', null,
+      v => { extras[e.id]=v; store.set('extras',extras); renderAll(); }));
+    if (canEdit && startOf(e) < new Date()) inputs.append(numField('實際報名人數', 'a-'+e.id, e.actualEntries, '賽後填', '會用來預估之後的賽事',
+      async v => { if (!db) return; try { await db.collection('events').doc(e.id).update({ actualEntries: v===''? null : Number(v) }); } catch(err){} }));
+    d.append(inputs);
+    if (c.overlay>0) d.append(el('div','note', `預估 Overlay：$${fmt(c.overlay)}`));
+    const pills = el('div','pills');
+    (e.perks||[]).forEach(p => pills.append(el('span','pill perk', p)));
+    (e.uncertain||[]).forEach(p => pills.append(el('span','pill warn', '待確認：'+p)));
+    if (pills.childNodes.length) d.append(pills);
+    const dl = el('dl');
+    [['起始籌碼', e.stack? fmt(e.stack):null],['升盲時間', e.levels],['截止買入', e.lateReg],['保證冠軍', e.champ? '$'+fmt(e.champ):null],['備註', e.notes],['來源', e.source]]
+      .forEach(([k,v]) => { if (v){ dl.append(el('dt',null,k), el('dd',null,v)); } });
+    d.append(dl);
+    return d;
+  }
+
+  // ---------- view: short money, agenda, calendar ----------
+  const wan = n => n==null ? '' : n >= 10000 ? (n % 10000 === 0 ? (n/10000).toLocaleString('zh-TW') : (n/10000).toFixed(1).replace(/\.0$/,'')) + '萬' : n.toLocaleString('zh-TW');
+  const dayLabel = d => { const [y,m,dd] = d.split('-').map(Number); const h = holidayOf(d); return `${m}/${dd}（${WD[new Date(Date.UTC(y,m-1,dd)).getUTCDay()]}）` + (h ? '・'+h : ''); };
+  function renderViewSwitch(){
+    document.querySelectorAll('.vs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === state.view)));
+  }
+  document.querySelectorAll('.vs button').forEach(b => b.onclick = () => { state.view = b.dataset.v; store.set('f_view', b.dataset.v); renderAll(); });
+  document.querySelectorAll('.pt button').forEach(b => b.onclick = () => { state.picksDay = b.dataset.d; store.set('f_picksDay', b.dataset.d); renderPicks(); });
+
+  function agendaRow({e,c}){
+    const wrap = el('div','arow-wrap'+(isPast(e)?' past':'')); wrap.id = 't-'+e.id;
+    const r = el('button','arow'); r.type='button'; r.setAttribute('aria-expanded', String(open.has(e.id)));
+    { const tc = el('span','a-time num', e.time||'—'); const rc = regCloseOf(e); if (rc) tc.append(el('small', isLive(e)?'live':null, '截 '+hhmm(rc))); r.append(tc); }
+    const mid = el('span','a-mid'); mid.append(el('span','a-name', e.name), el('span','a-venue', `${e.venue}・${cityOf(e)}`)); r.append(mid);
+    const money = el('span','a-money');
+    money.append(el('span','a-buy num', e.buyIn ? '$'+fmt(e.buyIn) : '—'));
+    if (e.gtd) money.append(el('span','a-gtd', '保 '+wan(e.gtd)));
+    else if (e.nonCash) money.append(el('span','a-gtd','實物'));
+    r.append(money);
+    let chip;
+    if (c.roi!=null && c.n) chip = el('span','a-chip num '+(c.roi>0?'good':'bad'), (c.roi>0?'+':'')+(c.roi*100).toFixed(0)+'%');
+    else if (c.be) chip = el('span','a-chip num', Math.ceil(c.be)+'人');
+    else chip = el('span','a-chip num dim', c.feePct!=null ? (c.feePct*100).toFixed(0)+'%費' : '—');
+    r.append(chip);
+    r.onclick = () => { open.has(e.id) ? open.delete(e.id) : open.add(e.id); renderList(); };
+    wrap.append(r);
+    if (open.has(e.id)) wrap.append(detail(e,c));
+    return wrap;
+  }
+  function renderAgenda(rows, list){
+    const byDay = new Map();
+    rows.slice().sort((a,b) => startOf(a.e)-startOf(b.e)).forEach(r => { if (!byDay.has(r.e.date)) byDay.set(r.e.date, []); byDay.get(r.e.date).push(r); });
+    const today = dayKey(new Date());
+    byDay.forEach((rs, d) => {
+      const sec = el('section','aday');
+      const h = el('div','aday-h'); h.append(el('b',null, dayLabel(d) + (d===today?'・今天':'')), el('span',null, `${rs.length} 場`));
+      sec.append(h);
+      const body = el('div','aday-b'); rs.forEach(r => body.append(agendaRow(r))); sec.append(body);
+      list.append(sec);
+    });
+    const legend = el('div','note','右側：有歷史人數時顯示預估 ROI，否則顯示保底人數；都沒有就顯示手續費比例。');
+    list.append(legend);
+  }
+
+  let calMonth = null, calDay = null;
+  function renderCalendar(list){
+    const today = dayKey(new Date());
+    if (!calDay) calDay = today;
+    if (!calMonth) calMonth = calDay.slice(0,7);
+    const pool = sorted(filtered(true));
+    const byDay = new Map(); pool.forEach(r => { if (!byDay.has(r.e.date)) byDay.set(r.e.date, []); byDay.get(r.e.date).push(r); });
+    const [Y,M] = calMonth.split('-').map(Number);
+    const cal = el('div','cal');
+    const nav = el('div','cal-nav');
+    const prev = el('button','btn ghost small','‹'); prev.type='button'; prev.setAttribute('aria-label','上個月');
+    const next = el('button','btn ghost small','›'); next.type='button'; next.setAttribute('aria-label','下個月');
+    const shift = k => { const d = new Date(Date.UTC(Y, M-1+k, 1)); calMonth = d.toISOString().slice(0,7); renderList(); };
+    prev.onclick = () => shift(-1); next.onclick = () => shift(1);
+    nav.append(prev, el('b',null, `${Y} 年 ${M} 月`), next); cal.append(nav);
+    const grid = el('div','cal-grid');
+    WD.forEach((w,i) => grid.append(el('div','cal-wd'+(i===0||i>=5?' wk':''), w)));
+    const first = new Date(Date.UTC(Y, M-1, 1)).getUTCDay();
+    const days = new Date(Date.UTC(Y, M, 0)).getUTCDate();
+    for (let i=0;i<first;i++) grid.append(el('div','cal-cell blank'));
+    for (let d=1; d<=days; d++){
+      const key = `${Y}-${String(M).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const rs = byDay.get(key) || [];
+      const dw = dowOf(key), hol = holidayOf(key);
+      const cell = el('button','cal-cell'+(key===today?' today':'')+(key===calDay?' picked':'')+(key<today?' past':'')+(rs.length?' has':'')+(dw===0||dw>=5?' wk':'')+(hol?' hol':''));
+      cell.type='button'; cell.setAttribute('aria-label', `${M}月${d}日${hol?'（'+hol+'）':''}，${rs.length} 場`);
+      cell.append(el('span','cal-d', String(d)));
+      if (hol) cell.append(el('span','cal-h', (hol.includes('補假') ? '補假' : hol.replace('紀念日','').replace('連假',''))));
+      if (rs.length){
+        cell.append(el('span','cal-n', rs.length+' 場'));
+        const top = Math.max(0, ...rs.map(r => r.e.gtd||0));
+        if (top) cell.append(el('span','cal-g', top >= 1000000 ? Math.round(top/10000)+'萬' : wan(top)));
+      }
+      cell.onclick = () => { calDay = key; renderList(); };
+      grid.append(cell);
+    }
+    cal.append(grid);
+    const lg = el('div','cal-legend'); const it = (v,t) => { const s2 = el('span'); const i = el('i'); i.style.background = `var(${v})`; s2.append(i, t); return s2; };
+    lg.append(it('--hol-bg','假日（五六日、國定假日）'), it('--felt','選取的日期'));
+    cal.append(lg); list.append(cal);
+    const rs = (byDay.get(calDay) || []).slice().sort((a,b) => startOf(a.e)-startOf(b.e));
+    const h = el('div','aday-h'); h.append(el('b',null, dayLabel(calDay) + (calDay===today?'・今天':'')), el('span',null, `${rs.length} 場`));
+    list.append(h);
+    if (!rs.length){ list.append(el('div','empty','這天沒有符合篩選的賽事。')); return; }
+    const body = el('div','aday-b'); rs.forEach(r => body.append(agendaRow(r))); list.append(body);
+  }
+
+  function renderList(){
+    const list = $('#list'); list.innerHTML=''; renderViewSwitch();
+    if (!events.length){ list.append(el('div','empty', db===null ? '暫時讀不到資料，請稍後重新整理。' : '還沒有賽事。')); return; }
+    if (state.view==='cal') return renderCalendar(list);
+    const rows = sorted(filtered());
+    if (!rows.length){
+      const noCity = state.city!=='all' && !events.some(e => cityOf(e)===state.city);
+      list.append(el('div','empty', noCity ? `${state.city}還沒有場館資料。按右下角「＋ 貼新賽程」貼上當地協會的貼文就會出現。` : '這個篩選條件下沒有賽事，按「清除篩選」看全部。'));
+      return;
+    }
+    if (state.view==='agenda') return renderAgenda(rows, list);
+    rows.forEach(r => list.append(ticket(r)));
+  }
+  function renderVenues(){
+    const box = $('#venues'); box.innerHTML='';
+    const vs = venues.filter(v => (state.city==='all' || v.city===state.city) && (state.venue==='all' || v.name===state.venue || (v.aliases||[]).includes(state.venue)));
+    if (!vs.length){ box.append(el('div','note','尚無場館資料。')); return; }
+    vs.forEach(v => {
+      const c = el('div','vcard'); c.append(el('b',null,v.name));
+      const meta = [v.city, v.handle && '@'+v.handle, v.address, v.hours, v.website].filter(Boolean).join('　');
+      if (meta) c.append(el('div','note', meta));
+      if ((v.rules||[]).length){ const ul = el('ul'); v.rules.forEach(r => ul.append(el('li',null,r))); c.append(ul); }
+      box.append(c);
+    });
+  }
+  function renderAll(){ renderControls(); renderStatus(); renderPicks(); renderList(); renderVenues(); }
+
+  renderAll();
+  (async () => {
+    try { db = await window.claude?.use?.('db'); } catch(e){ db = null; }
+    if (!db){ db = null; renderList(); return; }
+    editReady.then(v => { canEdit = v; $('#openAdmin').hidden = !v; renderList(); });
+    db.collection('events').onSnapshot(s => { rawEvents = s.docs.map(d => ({ id:d.id, ...d.data() })); recompute(); renderAll(); },
+      () => { $('#list').innerHTML=''; $('#list').append(el('div','empty','讀取賽程失敗，請重新整理頁面。')); });
+    db.collection('venues').onSnapshot(s => { allVenues = s.docs.map(d => ({ id:d.id, ...d.data() })); recompute(); renderAll(); renderAdmin(); });
+    db.doc('settings/main').onSnapshot(s => { settingsVer = s.exists; settings = s.exists ? { cities: [], ...s.data() } : { cities: [] }; renderAdmin(); });
+  })();
+
+  // ---------- admin ----------
+  const showAdmin = v => { $('#admin').hidden = !v; $('#scrim').hidden = !v; if (v) renderAdmin(); };
+  $('#openAdmin').onclick = () => showAdmin(true);
+  $('#closeAdmin').onclick = () => showAdmin(false);
+  const errMsg = e => e?.code==='permission_denied' || e?.code==='not_granted' ? '你沒有修改這個 App 的權限。' : '儲存失敗：' + (e?.message || '請稍後再試');
+  async function saveCities(list){
+    try {
+      if (settingsVer) await db.doc('settings/main').update({ cities: list });
+      else await db.doc('settings/main').set({ cities: list });
+    } catch(e){ $('#nv-msg').textContent = errMsg(e); }
+  }
+  function renderAdmin(){
+    if ($('#admin').hidden) return;
+    const cc = $('#cityChips'); cc.innerHTML='';
+    (settings.cities||[]).forEach(c => {
+      const ch = el('span','cchip',c); const x = el('button',null,'×'); x.type='button'; x.setAttribute('aria-label','移除 '+c);
+      x.onclick = () => saveCities(settings.cities.filter(k => k!==c));
+      ch.append(x); cc.append(ch);
+    });
+    if (!(settings.cities||[]).length) cc.append(el('span','note','還沒有設定縣市。'));
+    const sel = $('#addCitySel'); sel.innerHTML='';
+    CITIES.filter(c => !(settings.cities||[]).includes(c)).forEach(c => { const o=document.createElement('option'); o.value=o.textContent=c; sel.append(o); });
+    const ns = $('#nv-city'); const keep = ns.value; ns.innerHTML='';
+    CITIES.forEach(c => { const o=document.createElement('option'); o.value=o.textContent=c; ns.append(o); });
+    ns.value = keep || (settings.cities||[])[0] || '台中';
+
+    const box = $('#vlist'); box.innerHTML='';
+    const list = allVenues.filter(v => !v.removed).sort((a,b) => (a.inactive?1:0)-(b.inactive?1:0) || (a.city||'').localeCompare(b.city||'') || a.name.localeCompare(b.name));
+    if (!list.length) box.append(el('div','note','還沒有協會。'));
+    list.forEach(v => {
+      const row = el('div','vrow'+(v.inactive?' off':''));
+      const info = el('div'); const n = el('div','vn', v.name);
+      n.append(el('span','pill-s'+(v.inactive?'':' on'), v.inactive ? '已停用' : '追蹤中'));
+      const cnt = rawEvents.filter(e => e.venue===v.name || (v.aliases||[]).includes(e.venue)).length;
+      info.append(n, el('div','vm', [v.city, v.handle ? '@'+v.handle : null, v.website, `${cnt} 場賽事`].filter(Boolean).join('・')));
+      if (v.inactive && v.notes) info.append(el('div','vm', v.notes));
+      const acts = el('div','acts');
+      const tog = el('button','btn ghost small', v.inactive ? '恢復' : '停用'); tog.type='button';
+      tog.onclick = async () => { tog.disabled = true;
+        try { await db.collection('venues').doc(v.id).update(v.inactive ? { inactive:false, notes:'' } : { inactive:true, notes:'使用者手動停用（' + new Date().toLocaleDateString('zh-TW') + '）' }); }
+        catch(e){ $('#nv-msg').textContent = errMsg(e); tog.disabled = false; } };
+      const rm = el('button','btn warn small','移除'); rm.type='button';
+      rm.onclick = async () => {
+        if (rm.dataset.armed !== '1'){ rm.dataset.armed='1'; rm.textContent='確定移除？'; setTimeout(() => { rm.dataset.armed=''; rm.textContent='移除'; }, 3000); return; }
+        rm.disabled = true;
+        try { await db.collection('venues').doc(v.id).update({ inactive:true, removed:true }); }
+        catch(e){ $('#nv-msg').textContent = errMsg(e); rm.disabled = false; } };
+      acts.append(tog, rm); row.append(info, acts); box.append(row);
+    });
+  }
+  $('#addCity').onclick = () => { const c = $('#addCitySel').value; if (c) saveCities([...(settings.cities||[]), c]); };
+  $('#nv-save').onclick = async () => {
+    const name = $('#nv-name').value.trim(), handle = $('#nv-handle').value.trim().replace(/^@/,'').replace(/^https?:\/\/(www\.)?instagram\.com\//,'').replace(/\/.*$/,'');
+    const city = $('#nv-city').value, address = $('#nv-addr').value.trim();
+    if (!name || !handle){ $('#nv-msg').textContent = '請填名稱和 IG 帳號。'; return; }
+    const dup = allVenues.find(v => (v.handle||'').toLowerCase() === handle.toLowerCase());
+    if (dup && !dup.removed){ $('#nv-msg').textContent = `這個帳號已經在清單裡（${dup.name}）。`; return; }
+    const id = dup ? dup.id : handle.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60) || ('v-' + Date.now());
+    const body = { name, handle, city, auto:false, rules:[], sourceLabel:'IG 自動（尚未讀取）', inactive:false, removed:false };
+    if (address) body.address = address;
+    $('#nv-save').disabled = true;
+    try { await db.collection('venues').doc(id).set(body); $('#nv-msg').textContent = `已新增「${name}」，明天的每日更新會開始讀它的 IG。`; ['#nv-name','#nv-handle','#nv-addr'].forEach(s => $(s).value=''); }
+    catch(e){ $('#nv-msg').textContent = errMsg(e); }
+    finally { $('#nv-save').disabled = false; }
+  };
+
+  // ---------- add post sheet ----------
+  let sample = null, parsedRows = [];
+  const showSheet = v => { $('#sheet').hidden = !v; $('#scrim').hidden = !v; };
+  $('#fab').onclick = () => showSheet(true);
+  $('#closeSheet').onclick = () => showSheet(false);
+  $('#scrim').onclick = () => { showSheet(false); $('#admin').hidden = true; };
+  (async () => {
+    try { sample = await window.claude?.use?.('sample'); } catch(e){ sample = null; }
+    if (!sample || !(await editReady)){ $('#fab').hidden = true; return; }
+    $('#fab').hidden = false;
+    const lim = await sample.limits().catch(()=>null);
+    if (lim?.images){ $('#pickImg').hidden = false; $('#postImg').accept = lim.images.mediaTypes.join(','); }
+  })();
+  $('#pickImg').onclick = () => $('#postImg').click();
+  $('#postImg').onchange = () => { const f = [...$('#postImg').files]; $('#imgName').textContent = f.length ? `已選 ${f.length} 張` : ''; };
+
+  const PROMPT = () => `你是德州撲克賽事資料整理員。從下面的 IG 貼文文字和（或）海報圖片中，抽出每一場錦標賽，只輸出 JSON 陣列，不要其他文字。
+今天是 ${dayKey(new Date())}（台北時間）。日期沒寫年份時，用最接近今天的年份。
+每場一個物件，欄位：
+id: 英文小寫、數字、連字號，格式 "<場館代號>-<MMDD>-<HHMM>"
+venue: 場館名稱
+city: 場館所在縣市，只用這些寫法之一：${CITIES.join('、')}；看不出來就填 null 並寫進 uncertain
+date: "YYYY-MM-DD"，time: "HH:MM"
+name: 賽事名稱
+buyIn: 總報名費（數字）
+prize: 進獎池金額，bounty: 賞金部分，fee: 手續費／行政費（數字；海報沒拆分就填 null，不要推算）
+gtd: 保證獎池現金（數字，沒有就 null），gtdText: 保證內容原文（含門票、iPhone 等）
+nonCash: 保證內容含實物或門票時 true
+champ: 保證冠軍金額或 null
+stack: 起始籌碼（數字），levels: 升盲時間原文，lateReg: 截止買入原文
+perks: 優惠字串陣列
+notes: 其他重要規則
+uncertain: 看不清楚或不確定的地方，用中文短句列出；確定就給空陣列
+規則：看不清楚的數字填 null 並寫進 uncertain，絕對不要猜。沒有具體開賽時間的「全時段限時賽」不要列。`;
+
+  $('#parseBtn').onclick = async () => {
+    const text = $('#postText').value.trim(), imgs = [...$('#postImg').files];
+    if (!text && !imgs.length){ $('#parseStatus').textContent = '請先貼上文字或選一張海報。'; return; }
+    $('#parseBtn').disabled = true; $('#parseStatus').textContent = 'Claude 解析中…'; $('#parsed').innerHTML=''; $('#saveParsed').hidden = true;
+    try {
+      const out = await sample.json(PROMPT() + '\n\n貼文文字：\n' + (text||'（無，請看圖片）'), imgs.length ? { images: imgs, modelTier:'complex' } : { modelTier:'complex' });
+      parsedRows = Array.isArray(out) ? out : (out?.events || []);
+      if (!parsedRows.length){ $('#parseStatus').textContent = '沒有找到賽事，換一則貼文試試。'; return; }
+      $('#parseStatus').textContent = `找到 ${parsedRows.length} 場，勾選後加入：`;
+      parsedRows.forEach((r,i) => {
+        const l = el('label'); const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=true; cb.id='p-'+i; cb.dataset.i=i;
+        l.append(cb, el('span',null, `${r.date||'?'} ${r.time||''}｜${r.venue||''}｜${r.name||''}｜$${r.buyIn??'?'}` + ((r.uncertain||[]).length ? `（${r.uncertain.length} 項待確認）` : '')));
+        $('#parsed').append(l);
+      });
+      $('#saveParsed').hidden = false;
+    } catch(err){
+      $('#parseStatus').textContent = err?.code==='not_granted' ? '你沒有允許這個頁面使用 Claude，無法解析。' : err?.code==='rate_limited' ? '使用次數暫時到上限，請稍後再試。' : '解析失敗：' + (err?.message || '未知錯誤');
+    } finally { $('#parseBtn').disabled = false; }
+  };
+  $('#saveParsed').onclick = async () => {
+    if (!db){ $('#parseStatus').textContent = '無法寫入資料庫。'; return; }
+    const pick = [...document.querySelectorAll('#parsed input:checked')].map(c => parsedRows[c.dataset.i]);
+    $('#saveParsed').disabled = true; let ok = 0;
+    for (const r of pick){
+      const id = String(r.id || `${r.venue||'x'}-${r.date}-${r.time}`).toLowerCase().replace(/[^a-z0-9-]/g,'-').slice(0,60);
+      const { id:_, ...body } = r; body.source = body.source || 'IG 貼文（App 內解析）';
+      if (!body.city) body.city = venueOf(body)?.city || (state.city!=='all' ? state.city : null);
+      try { await db.collection('events').doc(id).set(body); ok++; } catch(e){}
+    }
+    $('#saveParsed').disabled = false; $('#parseStatus').textContent = `已加入 ${ok} 場。`;
+    if (ok){ $('#parsed').innerHTML=''; $('#saveParsed').hidden = true; $('#postText').value=''; $('#postImg').value=''; $('#imgName').textContent=''; }
+  };
+})();
+</script>
+
+</body>
+</html>
