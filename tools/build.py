@@ -8,6 +8,12 @@ shim that serves window.claude.use('db') from the static JSON files in data/.
 import sys, pathlib, re
 
 src = pathlib.Path(sys.argv[1]).read_text(encoding='utf-8')
+# Accept either the raw artifact source or the wrapped page returned by Artifact read.
+k = src.find('<title>')
+if k < 0: sys.exit('not an app page: no <title>')
+src = src[k:]
+src = re.sub(r'</body>\s*</html>\s*$', '', src.rstrip())
+if 'class="wrap"' not in src or '<script>' not in src: sys.exit('not an app page')
 root = pathlib.Path(sys.argv[2] if len(sys.argv) > 2 else '.')
 
 HEAD = '''<!doctype html>
