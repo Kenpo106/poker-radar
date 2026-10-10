@@ -729,7 +729,7 @@ details.fold .vcard{background:var(--bg)}
     prev.onclick = () => shift(-1); next.onclick = () => shift(1);
     nav.append(prev, el('b',null, `${Y} 年 ${M} 月`), next); cal.append(nav);
     const grid = el('div','cal-grid');
-    WD.forEach((w,i) => grid.append(el('div','cal-wd'+(i===0||i>=5?' wk':''), w)));
+    WD.forEach((w,i) => grid.append(el('div','cal-wd'+(i===0||i===6?' wk':''), w)));
     const first = new Date(Date.UTC(Y, M-1, 1)).getUTCDay();
     const days = new Date(Date.UTC(Y, M, 0)).getUTCDate();
     for (let i=0;i<first;i++) grid.append(el('div','cal-cell blank'));
@@ -737,7 +737,7 @@ details.fold .vcard{background:var(--bg)}
       const key = `${Y}-${String(M).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       const rs = byDay.get(key) || [];
       const dw = dowOf(key), hol = holidayOf(key);
-      const cell = el('button','cal-cell'+(key===today?' today':'')+(key===calDay?' picked':'')+(key<today?' past':'')+(rs.length?' has':'')+(dw===0||dw>=5?' wk':'')+(hol?' hol':''));
+      const cell = el('button','cal-cell'+(key===today?' today':'')+(key===calDay?' picked':'')+(key<today?' past':'')+(rs.length?' has':'')+(dw===0||dw===6?' wk':'')+(hol?' hol':''));
       cell.type='button'; cell.setAttribute('aria-label', `${M}月${d}日${hol?'（'+hol+'）':''}，${rs.length} 場`);
       cell.append(el('span','cal-d', String(d)));
       if (hol) cell.append(el('span','cal-h', (hol.includes('補假') ? '補假' : hol.replace('紀念日','').replace('連假',''))));
@@ -751,7 +751,7 @@ details.fold .vcard{background:var(--bg)}
     }
     cal.append(grid);
     const lg = el('div','cal-legend'); const it = (v,t) => { const s2 = el('span'); const i = el('i'); i.style.background = `var(${v})`; s2.append(i, t); return s2; };
-    lg.append(it('--hol-bg','假日（五六日、國定假日）'), it('--felt','選取的日期'));
+    lg.append(it('--hol-bg','假日（六日、國定假日）'), it('--felt','選取的日期'));
     cal.append(lg); list.append(cal);
     const rs = (byDay.get(calDay) || []).slice().sort((a,b) => startOf(a.e)-startOf(b.e));
     const h = el('div','aday-h'); h.append(el('b',null, dayLabel(calDay) + (calDay===today?'・今天':'')), el('span',null, `${rs.length} 場`));
