@@ -239,6 +239,42 @@ details.fold .vcard{background:var(--bg)}
 .pill-s.on{border-color:var(--good);color:var(--good)}
 .btn.warn{background:transparent;color:var(--bad);border:1px solid var(--bad)}
 @media (prefers-reduced-motion:no-preference){.ticket{transition:box-shadow .3s,opacity .2s}}
+
+/* ---- icon-first demo ---- */
+.ic{display:inline-flex;width:1.05em;height:1.05em;flex:none;vertical-align:-.15em}
+.ic svg{width:100%;height:100%}
+.iv{display:inline-flex;align-items:center;gap:4px;min-width:0}
+.iv>span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;background:none;border:0;padding:0}
+.controls .sel,.controls .sel.c3{grid-column:auto}
+@media (min-width:640px){.controls{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.sel>span:not(.ic){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.sel .sel-ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--gold);width:16px;height:16px;pointer-events:none;z-index:1}
+.sel select{min-height:40px;padding:0 20px 0 32px;font-size:15px;border-radius:999px;background-color:var(--surface)}
+.sel.on select{border-color:var(--gold-line);box-shadow:none;color:var(--gold)}
+.reset{grid-column:1/-1}
+.vs button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.h-brief{display:flex;align-items:center;gap:6px;font-size:14px;color:#F1D78C;margin-top:2px}
+.h-brief .ic{width:16px;height:16px}
+.h-kv{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:10px}
+.h-kv>span{align-items:center;text-align:center;padding:8px 4px;gap:2px}
+.h-kv>span .ic{color:var(--gold);width:18px;height:18px}
+.h-kv b{font-size:15px}
+.h-kv small{font-size:10px}
+.h-tag{display:inline-flex;align-items:center;gap:4px}
+.alt-sub{display:flex;gap:10px;overflow:hidden}
+.alt-sub .ic{color:var(--gold)}
+.alt-sub .iv:last-child{flex:1}
+.venue{display:flex;align-items:center;gap:4px}
+.venue .ic,.gtd .ic{color:var(--gold)}
+.gtd{display:flex;align-items:center;gap:4px}
+.tag{display:inline-flex;align-items:center;gap:3px}
+.mini .k{display:flex;align-items:center;gap:3px}
+.mini .k .ic{color:var(--gold);width:13px;height:13px}
+.a-gtd .ic{width:12px;height:12px}
+.a-chip.iv{justify-content:center;gap:3px}
+.a-chip .ic{width:12px;height:12px}
+details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
 </style>
 </head>
 <body>
@@ -251,16 +287,16 @@ details.fold .vcard{background:var(--bg)}
         <button class="btn ghost small" id="openAdmin" type="button" hidden>管理協會</button>
       </div>
     </div>
-    <div class="sub">各協會賽程一次看，算好手續費、保底人數和預估 ROI。</div>
+    
   </header>
 
   <section class="controls" aria-label="篩選">
-    <label class="sel c3"><span>縣市</span><select id="f-city"></select></label>
-    <label class="sel c3"><span>場館</span><select id="f-venue"></select></label>
-    <label class="sel c3"><span>日期</span><select id="f-date"></select></label>
-    <label class="sel c3"><span>買入</span><select id="f-buy"></select></label>
-    <label class="sel c3"><span>類型</span><select id="f-type"></select></label>
-    <label class="sel c3"><span>排序</span><select id="f-sort"></select></label>
+    <label class="sel c3" data-ic="pin"><span>縣市</span><select id="f-city"></select></label>
+    <label class="sel c3" data-ic="home"><span>場館</span><select id="f-venue"></select></label>
+    <label class="sel c3" data-ic="cal"><span>日期</span><select id="f-date"></select></label>
+    <label class="sel c3" data-ic="coin"><span>買入</span><select id="f-buy"></select></label>
+    <label class="sel c3" data-ic="tag"><span>類型</span><select id="f-type"></select></label>
+    <label class="sel c3" data-ic="sort"><span>排序</span><select id="f-sort"></select></label>
     <button class="reset" id="f-reset" type="button" hidden>清除篩選</button>
   </section>
 
@@ -270,14 +306,14 @@ details.fold .vcard{background:var(--bg)}
   </section>
 
   <div class="vs" role="group" aria-label="顯示方式">
-    <button type="button" data-v="cards">卡片</button>
-    <button type="button" data-v="cal">日曆</button>
-    <button type="button" data-v="agenda">清單</button>
+    <button type="button" data-v="cards" data-ic="grid">卡片</button>
+    <button type="button" data-v="cal" data-ic="cal">日曆</button>
+    <button type="button" data-v="agenda" data-ic="list">清單</button>
   </div>
   <div class="list" id="list"><div class="empty">正在讀取賽程…</div></div>
 
   <details class="fold how note">
-    <summary><span>數字怎麼算的</span><span class="chev" aria-hidden="true"></span></summary>
+    <summary><span class="iv"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg></span><span>數字怎麼算的</span></span><span class="chev" aria-hidden="true"></span></summary>
     <p><b>保底人數</b>：保證獎池 ÷ 每人進獎池的金額。實際報名（含重買）少於這個數，主辦要補錢，這部分叫 Overlay，對玩家是正 EV。</p>
     <p><b>預估 ROI</b>：假設你是平均水準的玩家，在預估人數下，每買入一次期望拿回多少。沒有 Overlay 時，ROI 就是負的手續費比例。賞金視為平均拿回。</p>
     <p><b>預估人數</b>：你填的優先；沒填就用同場館、同賽事過去實際人數的平均（卡片上標「歷史」）。賽事結束後，在卡片裡填實際人數，之後的預估會越來越準。</p>
@@ -285,7 +321,7 @@ details.fold .vcard{background:var(--bg)}
   </details>
 
   <details class="fold">
-    <summary><span>場館須知與資料更新</span><span class="chev" aria-hidden="true"></span></summary>
+    <summary><span class="iv"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span>場館須知與資料更新</span></span><span class="chev" aria-hidden="true"></span></summary>
     <div class="fold-body">
       <div class="status-strip" id="status" aria-label="資料狀態"></div>
       <div class="venues" id="venues"></div>
@@ -437,6 +473,37 @@ details.fold .vcard{background:var(--bg)}
   const isLive = e => { const n = new Date(); return startOf(e) <= n && !isPast(e); };
   const el = (tag, cls, text) => { const n=document.createElement(tag); if(cls) n.className=cls; if(text!=null) n.textContent=text; return n; };
 
+  // ---------- icons (inline SVG, stroke = currentColor) ----------
+  const ICON = {
+    pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+    home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+    cal:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    coin:'<circle cx="12" cy="12" r="9"/><path d="M14.8 9.2c-.5-.8-1.5-1.2-2.8-1.2-1.7 0-2.8.8-2.8 2s1 1.7 2.8 2 2.8.8 2.8 2-1.1 2-2.8 2c-1.3 0-2.3-.4-2.8-1.2M12 6.5V8M12 16v1.5"/>',
+    tag:'<path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="1"/>',
+    sort:'<path d="m21 16-4 4-4-4M17 20V4M3 8l4-4 4 4M7 4v16"/>',
+    users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+    pct:'<path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
+    trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8M18 2H6v7a6 6 0 0 0 12 0z"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+    shield:'<path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/>',
+    gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+    ticket:'<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 11v2M13 17v2"/>',
+    trend:'<path d="M22 7 13.5 15.5l-5-5L2 17"/><path d="M16 7h6v6"/>',
+    zap:'<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>',
+    alert:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+    layers:'<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/>',
+    crown:'<path d="m2 7 4.5 4L12 4l5.5 7L22 7l-2 12H4z"/>',
+    flame:'<path d="M12 22c4 0 7-2.7 7-7 0-4-3-6-4-9-1.5 2-2 3-2 5-1-1-2-2-2-4C8 9 5 11.5 5 15c0 4.3 3 7 7 7Z"/>',
+    info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>',
+    grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+    list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  };
+  const ic = (name, cls) => { const s = document.createElement('span'); s.className = 'ic'+(cls?' '+cls:''); s.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[name]||''}</svg>`; return s; };
+  const iv = (name, text, cls) => { const s = el('span','iv'+(cls?' '+cls:'')); s.append(ic(name), el('span',null,text)); return s; };
+  document.querySelectorAll('.vs button[data-ic]').forEach(b => b.prepend(ic(b.dataset.ic)));
+  document.querySelectorAll('.sel[data-ic]').forEach(l => l.prepend(ic(l.dataset.ic,'sel-ic')));
+
   function types(e){
     const t = [], txt = (e.name||'')+(e.gtdText||'');
     if (e.gtd) t.push('gtd');
@@ -495,18 +562,18 @@ details.fold .vcard{background:var(--bg)}
   function renderControls(){
     const count = {}; events.forEach(e => { const c = cityOf(e); (count[c] ||= new Set()).add(e.venue); });
     const withData = CITIES.filter(c => count[c]).concat(Object.keys(count).filter(c => !CITIES.includes(c)));
-    const groups = [{ items: [['all','全部縣市']].concat(withData.map(c => [c, `${c}（${count[c].size} 間）`])) }];
+    const groups = [{ items: [['all','全台']].concat(withData.map(c => [c, c])) }];
     const empty = CITIES.filter(c => !count[c]);
     if (empty.length) groups.push({ label:'尚無場館資料', items: empty.map(c => [c,c]) });
     fill($('#f-city'), groups, 'city');
 
     const vs = [...new Set(events.filter(e => state.city==='all' || cityOf(e)===state.city).map(e => e.venue))];
-    fill($('#f-venue'), [{ items: [['all', state.city==='all' ? '全部場館' : `${state.city}全部場館`]].concat(vs.map(v => [v,v])) }], 'venue');
-    fill($('#f-date'), [{ items: [['upcoming','即將開賽'],['today','今天'],['tomorrow','明天'],['week','7 天內'],['all','全部（含已結束）']] }], 'date');
+    fill($('#f-venue'), [{ items: [['all', '場館']].concat(vs.map(v => [v,v])) }], 'venue');
+    fill($('#f-date'), [{ items: [['upcoming','可報名'],['today','今天'],['tomorrow','明天'],['week','7 天內'],['all','全部（含已結束）']] }], 'date');
     $('#f-date').disabled = state.view === 'cal'; $('#f-date').title = state.view === 'cal' ? '日曆模式直接點日期' : '';
-    fill($('#f-buy'), [{ items: [['all','不限金額'],['1000','1,000 以下'],['2000','2,000 以下'],['3000','3,000 以下'],['5000','5,000 以下'],['10000','10,000 以下'],['over','10,000 以上']] }], 'buy');
-    fill($('#f-type'), [{ items: [['all','全部類型'],['gtd','保證賽'],['bounty','賞金賽'],['sat','衛星／門票'],['prize','實物獎品']] }], 'type');
-    fill($('#f-sort'), [{ items: [['smart','綜合推薦'],['roi','預估 ROI'],['be','保底人數'],['fee','手續費'],['time','開賽時間']] }], 'sort');
+    fill($('#f-buy'), [{ items: [['all','不限'],['1000','1,000 以下'],['2000','2,000 以下'],['3000','3,000 以下'],['5000','5,000 以下'],['10000','10,000 以下'],['over','10,000 以上']] }], 'buy');
+    fill($('#f-type'), [{ items: [['all','全部'],['gtd','保證賽'],['bounty','賞金賽'],['sat','衛星／門票'],['prize','實物獎品']] }], 'type');
+    fill($('#f-sort'), [{ items: [['smart','推薦'],['roi','預估 ROI'],['be','保底人數'],['fee','手續費'],['time','開賽時間']] }], 'sort');
     $('#f-reset').hidden = Object.keys(DEFAULTS).every(k => state[k]===DEFAULTS[k]);
   }
   $('#f-reset').onclick = () => { Object.keys(DEFAULTS).forEach(k => { state[k]=DEFAULTS[k]; store.set('f_'+k, DEFAULTS[k]); }); renderAll(); };
@@ -565,21 +632,21 @@ details.fold .vcard{background:var(--bg)}
     const money = n => '$'+fmt(n);
     const tags = [];
     const feeAvg = (() => { const f = pool.map(x => calc(x).feePct).filter(v => v!=null); return f.length ? f.reduce((a,b)=>a+b,0)/f.length : null; })();
-    if (c.feePct!=null && feeAvg!=null && pool.length>1 && feeAvg - c.feePct >= 0.03) tags.push({t:`抽水比今天平均低 ${Math.round((feeAvg-c.feePct)*100)}%`, k:'g'});
-    if (e.stack && e.buyIn && e.stack/e.buyIn >= 40) tags.push({t:`深籌 ${wan(e.stack)}`, k:'g'});
-    if (e.gtd && e.buyIn && e.gtd/e.buyIn >= 150) tags.push({t:`保證是買入的 ${Math.round(e.gtd/e.buyIn)} 倍`, k:'g'});
-    if (e.bounty) tags.push({t:`賞金 ${money(e.bounty)}`, k:''});
-    if (e.champ) tags.push({t:`保證冠軍 ${money(e.champ)}`, k:''});
+    if (c.feePct!=null && feeAvg!=null && pool.length>1 && feeAvg - c.feePct >= 0.03) tags.push({t:`抽水比今天平均低 ${Math.round((feeAvg-c.feePct)*100)}%`, s:`抽水低 ${Math.round((feeAvg-c.feePct)*100)}%`, i:'pct', k:'g'});
+    if (e.stack && e.buyIn && e.stack/e.buyIn >= 40) tags.push({t:`深籌 ${wan(e.stack)}`, s:`深籌 ${wan(e.stack)}`, i:'layers', k:'g'});
+    if (e.gtd && e.buyIn && e.gtd/e.buyIn >= 150) tags.push({t:`保證是買入的 ${Math.round(e.gtd/e.buyIn)} 倍`, s:`${Math.round(e.gtd/e.buyIn)} 倍保證`, i:'flame', k:'g'});
+    if (e.bounty) tags.push({t:`賞金 ${money(e.bounty)}`, s:`賞金 ${money(e.bounty)}`, i:'target', k:''});
+    if (e.champ) tags.push({t:`保證冠軍 ${money(e.champ)}`, s:`冠軍 ${wan(e.champ)}`, i:'crown', k:''});
     const rc = regCloseOf(e);
-    if (rc){ const left = (rc - new Date())/60e3; if (left>0 && left<=180) tags.push({t: left<60 ? `截買剩 ${Math.round(left)} 分` : `截買剩 ${(left/60).toFixed(1).replace(/\.0$/,'')} 小時`, k:'y'}); }
-    if ((e.uncertain||[]).length) tags.push({t:`${e.uncertain.length} 項待確認`, k:'r'});
+    if (rc){ const left = (rc - new Date())/60e3; if (left>0 && left<=180) tags.push({t: left<60 ? `截買剩 ${Math.round(left)} 分` : `截買剩 ${(left/60).toFixed(1).replace(/\.0$/,'')} 小時`, s: left<60 ? `剩 ${Math.round(left)} 分` : `剩 ${(left/60).toFixed(1).replace(/\.0$/,'')} 小時`, i:'clock', k:'y'}); }
+    if ((e.uncertain||[]).length) tags.push({t:`${e.uncertain.length} 項待確認`, s:`${e.uncertain.length} 待確認`, i:'alert', k:'r'});
     const be = c.be ? Math.ceil(c.be) : null;
     const nTxt = c.nSrc==='you' ? '你預估' : '過去平均';
     if (c.n && be){
       const meter = { n: c.n, be, label: nTxt };
       if (c.overlay > 0){
         const per = c.overlay / c.n / e.buyIn;
-        return { badge: c.roi>0 ? '正 EV・有 Overlay' : 'Overlay 機會', short:`Overlay 約 ${wan(Math.round(c.overlay/100)*100)}`, line:`${nTxt} ${c.n} 人，比保底 ${be} 人少 ${be-c.n} 人。主辦大約要補 ${money(Math.round(c.overlay/100)*100)} 進獎池，等於每個買入多拿 ${Math.round(per*100)}%，${c.roi>0 ? '扣掉手續費還是正 EV。' : `能抵掉一部分手續費（手續費 ${pct(c.feePct)}）。`}`, tags, meter };
+        return { badge: c.roi>0 ? '正 EV・有 Overlay' : 'Overlay 機會', brief:`主辦約補 ${wan(Math.round(c.overlay/100)*100)} 進獎池`, short:`Overlay 約 ${wan(Math.round(c.overlay/100)*100)}`, line:`${nTxt} ${c.n} 人，比保底 ${be} 人少 ${be-c.n} 人。主辦大約要補 ${money(Math.round(c.overlay/100)*100)} 進獎池，等於每個買入多拿 ${Math.round(per*100)}%，${c.roi>0 ? '扣掉手續費還是正 EV。' : `能抵掉一部分手續費（手續費 ${pct(c.feePct)}）。`}`, tags, meter };
       }
       return { badge: c.feePct!=null && c.feePct<=0.15 ? '低抽水' : '人數穩定', short: c.feePct!=null ? `抽水 ${pct(c.feePct)}` : `${c.n} 人`, line:`${nTxt} ${c.n} 人，已經超過保底 ${be} 人，不太會有 Overlay；${c.feePct!=null ? `主要看抽水 ${pct(c.feePct)}，` : ''}預估 ROI ${pct(c.roi)}。`, tags, meter };
     }
@@ -592,7 +659,7 @@ details.fold .vcard{background:var(--bg)}
       let badge = rankBe===1 ? '保底門檻最低' : `保底第 ${rankBe} 低`, why = many ? (rankBe===1 ? `是${dayWord} ${gPool.length} 場保證賽裡門檻最低的` : `在${dayWord} ${gPool.length} 場保證賽裡排第 ${rankBe} 低`) : '';
       if (many && rankBe>1 && e.gtd===maxG){ badge = '保證最大'; why = `保證 ${wan(e.gtd)} 是${dayWord}最大的`; }
       else if (many && rankBe>1 && c.feePct!=null && c.feePct===minFee){ badge = '抽水最低'; why = `抽水 ${pct(c.feePct)} 是${dayWord}保證賽裡最低的`; }
-      return { badge, short:`保底 ${be} 人`, line:`報名少於 ${be} 人就有 Overlay${why ? '，'+why : ''}。還沒有這場的歷史人數，點進去填入預估人數就能算出 ROI。`, tags, meter:null };
+      return { badge, brief: many ? (rankBe===1 ? `${dayWord} ${gPool.length} 場保證賽中最容易 Overlay` : why) : `報名少於 ${be} 人就有 Overlay`, short:`保底 ${be} 人`, line:`報名少於 ${be} 人就有 Overlay${why ? '，'+why : ''}。還沒有這場的歷史人數，點進去填入預估人數就能算出 ROI。`, tags, meter:null };
     }
     return { badge: c.feePct!=null && c.feePct<=0.15 ? '低抽水' : '無保證', short: c.feePct!=null ? `抽水 ${pct(c.feePct)}` : '—', line:`沒有保證獎池，獎池完全看報名人數${c.feePct!=null ? `；抽水 ${pct(c.feePct)}` : ''}。`, tags, meter:null };
   }
@@ -627,15 +694,16 @@ details.fold .vcard{background:var(--bg)}
       const ml = el('span','h-ml'); ml.append(el('span',null,`${R.meter.label} ${R.meter.n} 人`), el('span',null,`保底 ${R.meter.be} 人`));
       h.append(m, ml);
     }
-    h.append(el('span','h-why', R.line));
+    { const w = el('span','h-brief'); w.append(ic('target'), el('span',null,R.brief||R.badge)); h.append(w); }
     const kv = el('span','h-kv');
-    const k = (label, v, cls) => { const d = el('span'); d.append(el('small',null,label), el('b','num'+(cls?' '+cls:''), v)); kv.append(d); };
-    k('買入', e.buyIn ? '$'+fmt(e.buyIn) : '—');
-    k('手續費', pct(c.feePct));
-    if (c.roi!=null && c.n) k('預估 ROI', (c.roi>0?'+':'')+pct(c.roi), c.roi>0?'up':'');
-    else k('保證獎池', e.gtd ? wan(e.gtd) : '—');
+    const k = (icon, v, label, cls) => { const d = el('span'); d.append(ic(icon), el('b','num'+(cls?' '+cls:''), v), el('small',null,label)); kv.append(d); };
+    k('coin', e.buyIn ? '$'+fmt(e.buyIn) : '—', '買入');
+    k('pct', pct(c.feePct).replace('.0%','%'), '抽水');
+    if (c.roi!=null && c.n) k('trend', (c.roi>0?'+':'')+pct(c.roi), 'ROI', c.roi>0?'up':'');
+    else k('users', c.be ? Math.ceil(c.be)+'' : '—', '保底人數');
+    k('trophy', e.gtd ? wan(e.gtd) : '—', '保證');
     h.append(kv);
-    if (R.tags.length){ const tg = el('span','h-tags'); R.tags.slice(0,4).forEach(t => tg.append(el('span','h-tag '+t.k, t.t))); h.append(tg); }
+    if (R.tags.length){ const tg = el('span','h-tags'); R.tags.slice(0,3).forEach(t => { const x = el('span','h-tag '+t.k); x.append(ic(t.i||'info'), el('span',null,t.s||t.t)); tg.append(x); }); h.append(tg); }
     h.onclick = () => goToEvent(e);
     box.append(h);
 
@@ -643,7 +711,7 @@ details.fold .vcard{background:var(--bg)}
     ranked.slice(1).forEach(({e,c}, i) => {
       const r = pickReason(e, c, pool);
       const row = el('button','alt'); row.type='button';
-      const l = el('span','alt-l'); l.append(el('span','alt-name', e.name), el('span','alt-sub', `${whenTxt(e)}・${e.venue}・${e.buyIn?'$'+fmt(e.buyIn):'—'}`));
+      const l = el('span','alt-l'); const sub = el('span','alt-sub'); sub.append(iv('clock', e.time), iv('coin', e.buyIn?'$'+fmt(e.buyIn):'—'), iv('pin', e.venue.replace(/（.*?）/,''))); l.append(el('span','alt-name', e.name), sub);
       const rr = el('span','alt-r'); rr.append(el('b',null,r.badge), el('span',null,r.short));
       row.append(el('span','alt-n num', String(i+2)), l, rr);
       row.onclick = () => goToEvent(e);
@@ -666,22 +734,22 @@ details.fold .vcard{background:var(--bg)}
     when.append(el('div','d', `${mm}/${dd}（${WD[new Date(Date.UTC(yy,mm-1,dd)).getUTCDay()]}）`), el('div','t', e.time||'—'));
     { const rc = regCloseOf(e); if (rc) when.append(el('div','rc', '截買 '+hhmm(rc))); }
     const what = el('div','what');
-    what.append(el('div','venue', e.venue), el('div','name', e.name));
-    if (e.gtdText) what.append(el('div','gtd', e.gtdText));
-    const tags = el('div','tags'); if (isLive(e)) tags.append(el('span','tag live','開賽中・可報名')); types(e).forEach(k => tags.append(el('span','tag', TYPE_LABEL[k])));
-    if ((e.uncertain||[]).length) tags.append(el('span','tag warn', `${e.uncertain.length} 項待確認`));
+    { const v = el('div','venue'); v.append(ic('pin'), el('span',null,e.venue)); what.append(v, el('div','name', e.name)); }
+    if (e.gtd || e.gtdText){ const g = el('div','gtd'); g.append(ic(e.nonCash && !e.gtd ? 'gift' : 'trophy'), el('span',null, e.gtd ? '保證 '+wan(e.gtd) : e.gtdText)); what.append(g); }
+    const tags = el('div','tags'); if (isLive(e)) tags.append(iv('zap','可報名','tag live')); const TI = {gtd:'shield',bounty:'target',sat:'ticket',prize:'gift'}; types(e).forEach(k => tags.append(iv(TI[k], TYPE_LABEL[k].replace('衛星／門票','衛星'), 'tag')));
+    if ((e.uncertain||[]).length) tags.append(iv('alert', `${e.uncertain.length}`, 'tag warn'));
     if (tags.childNodes.length) what.append(tags);
     head.append(when, what);
     head.onclick = () => { open.has(e.id) ? open.delete(e.id) : open.add(e.id); renderList(); };
     t.append(head);
 
     const mini = el('div','mini');
-    const cell = (k, v, cls, small) => { const d = el('div'); const vv = el('span','v num'+(cls?' '+cls:''), v); if (small) vv.append(el('small',null,small)); d.append(el('span','k',k), vv); mini.append(d); };
+    const MI = {'買入':'coin','手續費':'pct','保底':'users','預估 ROI':'trend'}; const cell = (k, v, cls, small) => { const d = el('div'); d.title = k; const vv = el('span','v num'+(cls?' '+cls:''), v); if (small) vv.append(el('small',null,small)); const kk = el('span','k'); kk.append(ic(MI[k]), el('span',null, k==='手續費'?'抽水':k==='預估 ROI'?'ROI':k)); d.append(kk, vv); mini.append(d); };
     cell('買入', e.buyIn ? '$'+fmt(e.buyIn) : '—');
     cell('手續費', pct(c.feePct), c.feePct>0.22 ? 'bad' : '');
     cell('保底', c.be ? Math.ceil(c.be)+'人' : '—');
     if (c.roi!=null) cell('預估 ROI', (c.roi>0?'+':'')+pct(c.roi), c.roi>0?'good':'bad', c.nSrc==='hist'?'歷史':'');
-    else cell('預估 ROI', '展開填人數', 'dim');
+    else cell('預估 ROI', '—', 'dim');
     t.append(mini);
 
     if (open.has(e.id)) t.append(detail(e,c));
@@ -741,13 +809,13 @@ details.fold .vcard{background:var(--bg)}
     const mid = el('span','a-mid'); mid.append(el('span','a-name', e.name), el('span','a-venue', `${e.venue}・${cityOf(e)}`)); r.append(mid);
     const money = el('span','a-money');
     money.append(el('span','a-buy num', e.buyIn ? '$'+fmt(e.buyIn) : '—'));
-    if (e.gtd) money.append(el('span','a-gtd', '保 '+wan(e.gtd)));
-    else if (e.nonCash) money.append(el('span','a-gtd','實物'));
+    if (e.gtd) money.append(iv('trophy', wan(e.gtd), 'a-gtd'));
+    else if (e.nonCash) money.append(iv('gift','實物','a-gtd'));
     r.append(money);
     let chip;
     if (c.roi!=null && c.n) chip = el('span','a-chip num '+(c.roi>0?'good':'bad'), (c.roi>0?'+':'')+(c.roi*100).toFixed(0)+'%');
-    else if (c.be) chip = el('span','a-chip num', Math.ceil(c.be)+'人');
-    else chip = el('span','a-chip num dim', c.feePct!=null ? (c.feePct*100).toFixed(0)+'%費' : '—');
+    else if (c.be) chip = iv('users', Math.ceil(c.be)+'', 'a-chip num');
+    else chip = iv('pct', c.feePct!=null ? (c.feePct*100).toFixed(0)+'' : '—', 'a-chip num dim');
     r.append(chip);
     r.onclick = () => { open.has(e.id) ? open.delete(e.id) : open.add(e.id); renderList(); };
     wrap.append(r);
