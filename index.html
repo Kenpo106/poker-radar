@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="台灣撲克協會錦標賽一次看：手續費、保底人數、預估 ROI 與今日推薦。">
+<meta name="description" content="台灣撲克協會錦標賽一次看：保底人數、早鳥優惠與今日推薦。">
 <meta name="theme-color" content="#0A0A0B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -316,7 +316,6 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
   <details class="fold how note">
     <summary><span class="iv"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg></span><span>數字怎麼算的</span></span><span class="chev" aria-hidden="true"></span></summary>
     <p><b>保底人數</b>：保證獎池 ÷ 每人進獎池的金額。實際報名（含重買）少於這個數，主辦要補錢，這部分叫 Overlay，對玩家是正 EV。</p>
-    <p><b>預估 ROI</b>：假設你是平均水準的玩家，在預估人數下，每買入一次期望拿回多少。沒有 Overlay 時，ROI 就是負的手續費比例。賞金視為平均拿回。</p>
     <p><b>預估人數</b>：你填的優先；沒填就用同場館、同賽事過去實際人數的平均（卡片上標「歷史」）。賽事結束後，在卡片裡填實際人數，之後的預估會越來越準。</p>
     <p>iPhone、門票這類實物獎品沒有現金價值，要自己填估值。早鳥折扣沒有算進去。</p>
   </details>
@@ -577,7 +576,7 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
     $('#f-date').disabled = state.view === 'cal'; $('#f-date').title = state.view === 'cal' ? '日曆模式直接點日期' : '';
     fill($('#f-buy'), [{ items: [['all','不限'],['1000','1,000 以下'],['2000','2,000 以下'],['3000','3,000 以下'],['5000','5,000 以下'],['10000','10,000 以下'],['over','10,000 以上']] }], 'buy');
     fill($('#f-type'), [{ items: [['all','全部'],['gtd','保證賽'],['bounty','賞金賽'],['sat','衛星／門票'],['prize','實物獎品']] }], 'type');
-    fill($('#f-sort'), [{ items: [['smart','推薦'],['roi','預估 ROI'],['be','保底人數'],['time','開賽時間']] }], 'sort');
+    fill($('#f-sort'), [{ items: [['smart','推薦'],['be','保底人數'],['time','開賽時間']] }], 'sort');
     $('#f-reset').hidden = Object.keys(DEFAULTS).every(k => state[k]===DEFAULTS[k]);
   }
   $('#f-reset').onclick = () => { Object.keys(DEFAULTS).forEach(k => { state[k]=DEFAULTS[k]; store.set('f_'+k, DEFAULTS[k]); }); renderAll(); };
@@ -598,8 +597,8 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
     });
   }
   const nz = (v, dir) => v==null ? Infinity : v*dir;
-  function smartKey(c){ // ROI when known, otherwise ease of overlay, otherwise fee
-    if (c.roi!=null && c.n) return -c.roi*1000;
+  function smartKey(c){ // known entries vs guarantee first, otherwise ease of overlay
+    if (c.n && c.be) return c.n / c.be;
     if (c.be) return 100 + c.be/10;
     return 1000 + (c.feePct??1)*100;
   }
@@ -610,7 +609,6 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
       if (state.sort==='time') return t;
       if (state.sort==='fee') return nz(a.c.feePct,1)-nz(b.c.feePct,1) || t;
       if (state.sort==='be') return nz(a.c.be,1)-nz(b.c.be,1) || t;
-      if (state.sort==='roi') return nz(a.c.roi,-1)-nz(b.c.roi,-1) || t;
       return smartKey(a.c)-smartKey(b.c) || t;
     });
     return arr;
@@ -650,7 +648,7 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
       const meter = { n: c.n, be, label: nTxt };
       if (c.overlay > 0){
         const per = c.overlay / c.n / e.buyIn;
-        return { badge: c.roi>0 ? '正 EV・有 Overlay' : 'Overlay 機會', brief:`主辦約補 ${wan(Math.round(c.overlay/100)*100)} 進獎池`, short:`Overlay 約 ${wan(Math.round(c.overlay/100)*100)}`, line:`${nTxt} ${c.n} 人，比保底 ${be} 人少 ${be-c.n} 人。主辦大約要補 ${money(Math.round(c.overlay/100)*100)} 進獎池，等於每個買入多拿 ${Math.round(per*100)}%，${c.roi>0 ? '扣掉手續費還是正 EV。' : `能抵掉一部分手續費（手續費 ${pct(c.feePct)}）。`}`, tags, meter };
+        return { badge: 'Overlay 機會', brief:`主辦約補 ${wan(Math.round(c.overlay/100)*100)} 進獎池`, short:`Overlay 約 ${wan(Math.round(c.overlay/100)*100)}`, line:`${nTxt} ${c.n} 人，比保底 ${be} 人少 ${be-c.n} 人。主辦大約要補 ${money(Math.round(c.overlay/100)*100)} 進獎池，等於每個買入多拿 ${Math.round(per*100)}%，${c.roi>0 ? '扣掉手續費還是正 EV。' : `能抵掉一部分手續費（手續費 ${pct(c.feePct)}）。`}`, tags, meter };
       }
       return { badge: '人數穩定', short: `約 ${c.n} 人`, line:`${nTxt} ${c.n} 人，已經超過保底 ${be} 人，不太會有 Overlay；${c.feePct!=null ? `主要看抽水 ${pct(c.feePct)}，` : ''}預估 ROI ${pct(c.roi)}。`, tags, meter };
     }
@@ -701,8 +699,7 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
     const kv = el('span','h-kv');
     const k = (icon, v, label, cls) => { const d = el('span'); d.append(ic(icon), el('b','num'+(cls?' '+cls:''), v), el('small',null,label)); kv.append(d); };
     k('coin', e.buyIn ? '$'+fmt(e.buyIn) : '—', '買入');
-    if (c.roi!=null && c.n) k('trend', (c.roi>0?'+':'')+pct(c.roi), 'ROI', c.roi>0?'up':'');
-    else k('users', c.be ? Math.ceil(c.be)+'' : '—', '保底人數');
+    k('users', c.be ? Math.ceil(c.be)+'' : '—', '保底人數');
     k('trophy', e.gtd ? wan(e.gtd) : '—', '保證');
     { const eb = ebShort(e); if (eb) k('gift', eb, '早鳥', 'eb'); else { const rc = regCloseOf(e); k('clock', rc ? hhmm(rc) : '—', '截買'); } }
     h.append(kv);
@@ -747,12 +744,12 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
     t.append(head);
 
     const mini = el('div','mini');
-    const MI = {'買入':'coin','早鳥':'gift','保底':'users','預估 ROI':'trend'}; const cell = (k, v, cls, small) => { const d = el('div'); d.title = k; const vv = el('span','v num'+(cls?' '+cls:''), v); if (small) vv.append(el('small',null,small)); const kk = el('span','k'); kk.append(ic(MI[k]), el('span',null, k==='預估 ROI'?'ROI':k)); d.append(kk, vv); mini.append(d); };
+    const MI = {'買入':'coin','早鳥':'gift','保底':'users','預估人數':'trend'}; const cell = (k, v, cls, small) => { const d = el('div'); d.title = k; const vv = el('span','v num'+(cls?' '+cls:''), v); if (small) vv.append(el('small',null,small)); const kk = el('span','k'); kk.append(ic(MI[k]), el('span',null, k==='預估人數'?'預估':k)); d.append(kk, vv); mini.append(d); };
     cell('買入', e.buyIn ? '$'+fmt(e.buyIn) : '—');
     cell('早鳥', ebShort(e) || '—', ebShort(e) ? 'eb' : 'dim');
     cell('保底', c.be ? Math.ceil(c.be)+'人' : '—');
-    if (c.roi!=null) cell('預估 ROI', (c.roi>0?'+':'')+pct(c.roi), c.roi>0?'good':'bad', c.nSrc==='hist'?'歷史':'');
-    else cell('預估 ROI', '—', 'dim');
+    if (c.n) cell('預估人數', c.n+'人', c.be && c.n < c.be ? 'good' : '', c.nSrc==='hist'?'歷史':'');
+    else cell('預估人數', '—', 'dim');
     t.append(mini);
 
     if (open.has(e.id)) t.append(detail(e,c));
@@ -816,8 +813,7 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
     else if (e.nonCash) money.append(iv('gift','實物','a-gtd'));
     r.append(money);
     let chip;
-    if (c.roi!=null && c.n) chip = el('span','a-chip num '+(c.roi>0?'good':'bad'), (c.roi>0?'+':'')+(c.roi*100).toFixed(0)+'%');
-    else if (c.be) chip = iv('users', Math.ceil(c.be)+'', 'a-chip num');
+    if (c.be) chip = iv('users', Math.ceil(c.be)+'', 'a-chip num');
     else if (ebShort(e)) chip = iv('gift', ebShort(e), 'a-chip num eb');
     else chip = el('span','a-chip num dim', '—');
     r.append(chip);
@@ -837,7 +833,7 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
       const body = el('div','aday-b'); rs.forEach(r => body.append(agendaRow(r))); sec.append(body);
       list.append(sec);
     });
-    const legend = el('div','note','右側：有人數資料時顯示預估 ROI，否則顯示保底人數；沒有保證獎池時顯示早鳥優惠。');
+    const legend = el('div','note','右側：有保證獎池時顯示保底人數；沒有時顯示早鳥優惠。');
     list.append(legend);
   }
 

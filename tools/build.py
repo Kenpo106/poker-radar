@@ -21,7 +21,7 @@ HEAD = '''<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="台灣撲克協會錦標賽一次看：手續費、保底人數、預估 ROI 與今日推薦。">
+<meta name="description" content="台灣撲克協會錦標賽一次看：保底人數、早鳥優惠與今日推薦。">
 <meta name="theme-color" content="#0A0A0B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
