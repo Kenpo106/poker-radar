@@ -432,6 +432,19 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
   const dowOf = d => { const [y,m,dd] = d.split('-').map(Number); return new Date(Date.UTC(y,m-1,dd)).getUTCDay(); };
   let events = [], venues = [], db = null;
   let rawEvents = [], allVenues = [], settings = { cities: [] }, settingsVer = false;
+
+  // 一律 24 小時制：把「下午3:00」「3:00 PM」「晚上8點」「9:5」等寫法轉成 HH:MM
+  function to24(txt){
+    if (txt == null) return txt;
+    return String(txt).replace(/點半/g,'點30分')
+      .replace(/(上午|早上|凌晨|中午|下午|晚上|傍晚)\s*(\d{1,2})(?:[:：點](\d{1,2})?分?)?/g, (m, p, h, mm) => {
+        h = Number(h); if (/下午|晚上|傍晚/.test(p) && h < 12) h += 12; if (p==='中午' && h < 11) h += 12; if (/凌晨|上午|早上/.test(p) && h === 12) h = 0;
+        return String(h).padStart(2,'0') + ':' + String(mm||0).padStart(2,'0'); })
+      .replace(/(\d{1,2})[:：](\d{2})\s*([AaPp])\.?\s*[Mm]\.?/g, (m, h, mm, ap) => {
+        h = Number(h) % 12; if (/p/i.test(ap)) h += 12; return String(h).padStart(2,'0') + ':' + mm; })
+      .replace(/(^|[^\d])(\d)[:：](\d{2})(?!\d)/g, (m, pre, h, mm) => pre + '0' + h + ':' + mm);
+  }
+  function norm24(e){ ['time','lateReg','regClose','levels','notes'].forEach(k => { if (typeof e[k] === 'string') e[k] = to24(e[k]); }); if (Array.isArray(e.perks)) e.perks = e.perks.map(to24); return e; }
   function recompute(){
     const hidden = new Set(allVenues.filter(v => v.inactive).flatMap(v => [v.name, ...(v.aliases||[])]));
     events = rawEvents.filter(e => !hidden.has(e.venue));
@@ -916,9 +929,9 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
     try { db = await window.claude?.use?.('db'); } catch(e){ db = null; }
     if (!db){ db = null; renderList(); return; }
     editReady.then(v => { canEdit = v; $('#openAdmin').hidden = !v; renderList(); });
-    db.collection('events').onSnapshot(s => { rawEvents = s.docs.map(d => ({ id:d.id, ...d.data() })); recompute(); renderAll(); },
+    db.collection('events').onSnapshot(s => { rawEvents = s.docs.map(d => norm24({ id:d.id, ...d.data() })); recompute(); renderAll(); },
       () => { $('#list').innerHTML=''; $('#list').append(el('div','empty','讀取賽程失敗，請重新整理頁面。')); });
-    db.collection('venues').onSnapshot(s => { allVenues = s.docs.map(d => ({ id:d.id, ...d.data() })); recompute(); renderAll(); renderAdmin(); });
+    db.collection('venues').onSnapshot(s => { allVenues = s.docs.map(d => { const v = { id:d.id, ...d.data() }; ['hours','notes'].forEach(k => { if (typeof v[k]==='string') v[k]=to24(v[k]); }); if (Array.isArray(v.rules)) v.rules = v.rules.map(to24); return v; }); recompute(); renderAll(); renderAdmin(); });
     db.doc('settings/main').onSnapshot(s => { settingsVer = s.exists; settings = s.exists ? { cities: [], ...s.data() } : { cities: [] }; renderAdmin(); });
   })();
 
