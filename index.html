@@ -453,7 +453,7 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
   const DEFAULTS = { city:'all', venue:'all', date:'upcoming', buy:'all', type:'all', sort:'smart' };
   const state = {}; Object.keys(DEFAULTS).forEach(k => state[k] = store.get('f_'+k, DEFAULTS[k]));
   state.picksDay = store.get('f_picksDay', 'today');
-  state.view = store.get('f_view', 'cards'); if (!['cards','cal','agenda'].includes(state.view)) state.view = 'cards';
+  state.view = store.get('f_view2', 'agenda'); if (!['cards','cal','agenda'].includes(state.view)) state.view = 'agenda';
   // Taiwan's 22 counties/cities, north to south, for the region menu
   const CITIES = ['基隆','台北','新北','桃園','新竹市','新竹縣','苗栗','台中','彰化','南投','雲林','嘉義市','嘉義縣','台南','高雄','屏東','宜蘭','花蓮','台東','澎湖','金門','連江'];
   let entries = store.get('entries', {});
@@ -812,7 +812,7 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
   function renderViewSwitch(){
     document.querySelectorAll('.vs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === state.view)));
   }
-  document.querySelectorAll('.vs button').forEach(b => b.onclick = () => { state.view = b.dataset.v; store.set('f_view', b.dataset.v); renderAll(); });
+  document.querySelectorAll('.vs button').forEach(b => b.onclick = () => { state.view = b.dataset.v; store.set('f_view2', b.dataset.v); renderAll(); });
   document.querySelectorAll('.pt button').forEach(b => b.onclick = () => { state.picksDay = b.dataset.d; store.set('f_picksDay', b.dataset.d); renderPicks(); });
 
   function agendaRow({e,c}){
