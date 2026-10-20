@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>撲克賽程雷達</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -262,13 +263,33 @@ details.fold .vcard{background:var(--bg)}
 .a-chip .ic{width:12px;height:12px}
 details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
 .v.eb,.h-kv b.eb,.a-chip.eb{color:var(--gold)}
+/* feedback + stats */
+.fbbtn{display:inline-flex;align-items:center;gap:6px}
+.fbbtn .ic{width:15px;height:15px;color:var(--gold)}
+.fb-foot{display:flex;justify-content:center}
+.sheet input[type=text]{width:100%;font:inherit;font-size:16px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kpi{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi small{font-size:11px;color:var(--muted)}
+.kpi b{font-family:var(--f-num);font-size:22px;color:var(--gold);font-variant-numeric:tabular-nums}
+.stbl{width:100%;border-collapse:collapse;font-size:13px}
+.stbl th{color:var(--muted);font-weight:500;text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)}
+.stbl th:first-child,.stbl td:first-child{text-align:left}
+.stbl td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.fblist{display:flex;flex-direction:column;gap:6px}
+.fbitem{background:var(--bg);border-radius:10px;padding:8px 10px;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.fbitem .vm{font-size:12px;color:var(--muted);margin-top:4px;white-space:normal}
+.admin .status-strip{flex-wrap:wrap}
+.admin input[type=url]{font:inherit;font-size:14px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:7px 8px;min-width:0;flex:1}
 </style>
 
 <div class="wrap">
   <header>
     <div class="head-row"><h1>撲克賽程雷達</h1>
       <div class="head-tools">
-        <button class="btn ghost small" id="openAdmin" type="button" hidden>管理協會</button>
+        <button class="btn ghost small fbbtn" id="openFb" type="button" data-ic="chat">意見回饋</button>
+        <button class="btn ghost small" id="openAdmin" type="button" hidden>後台</button>
       </div>
     </div>
     
@@ -304,12 +325,12 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
   </details>
 
   <details class="fold">
-    <summary><span class="iv"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span>場館須知與資料更新</span></span><span class="chev" aria-hidden="true"></span></summary>
+    <summary><span class="iv"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span>場館須知</span></span><span class="chev" aria-hidden="true"></span></summary>
     <div class="fold-body">
-      <div class="status-strip" id="status" aria-label="資料狀態"></div>
       <div class="venues" id="venues"></div>
     </div>
   </details>
+  <div class="fb-foot"><button class="btn ghost small fbbtn" id="openFb2" type="button" data-ic="chat">有想法或發現資料錯誤？告訴我們</button></div>
 </div>
 
 <button class="fab" id="fab" type="button" hidden>＋ 貼新賽程</button>
@@ -326,8 +347,44 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
   <button class="btn" id="saveParsed" type="button" hidden>加入勾選的賽事</button>
 </section>
 
-<section class="sheet admin" id="admin" hidden aria-label="管理協會">
-  <div class="head-row"><b>管理協會</b><button class="btn ghost small" id="closeAdmin" type="button">關閉</button></div>
+<section class="sheet" id="fbSheet" hidden aria-label="意見回饋">
+  <div class="head-row"><b>意見回饋／建議</b><button class="btn ghost small" id="closeFb" type="button">關閉</button></div>
+  <div class="note">想看到哪間協會、哪個功能，或發現賽程資料有錯，都歡迎留言。不會記錄你的個人資料。</div>
+  <textarea id="fbText" maxlength="1000" placeholder="例：希望加入台南的協會／10/18 某場的報名費好像寫錯了"></textarea>
+  <input type="text" id="fbContact" maxlength="100" placeholder="聯絡方式（選填，想收到回覆再填）" autocomplete="off">
+  <input type="text" id="fbHp" class="hp" tabindex="-1" aria-hidden="true" autocomplete="off">
+  <div class="row"><button class="btn" id="fbSend" type="button">送出</button></div>
+  <div class="toast" id="fbMsg" role="status"></div>
+</section>
+
+<section class="sheet admin" id="admin" hidden aria-label="後台">
+  <div class="head-row"><b>後台</b><button class="btn ghost small" id="closeAdmin" type="button">關閉</button></div>
+
+  <div class="a-block">
+    <div class="a-title">使用統計</div>
+    <div class="note" id="stNote">公開網站的使用人數，每天早上隨資料更新同步一次。</div>
+    <div class="kpis" id="stKpis"></div>
+    <div id="stTable"></div>
+    <div class="row"><a class="btn ghost small" id="stLive" target="_blank" rel="noopener" hidden>開啟即時統計</a></div>
+  </div>
+
+  <div class="a-block">
+    <div class="a-title">使用回饋</div>
+    <div class="fblist" id="fbList"></div>
+  </div>
+
+  <div class="a-block">
+    <div class="a-title">資料來源與更新</div>
+    <div class="note">綠點：2 天內更新；黃點：超過 2 天；紅點：超過 7 天。</div>
+    <div class="status-strip" id="status" aria-label="資料狀態"></div>
+  </div>
+
+  <div class="a-block">
+    <div class="a-title">統計服務設定</div>
+    <div class="note">貼上 Google Apps Script 部署後的網址（https://script.google.com/macros/s/…/exec）。公開網站的使用人數和回饋會送到這裡。</div>
+    <div class="row"><input type="url" id="apiUrl" placeholder="https://script.google.com/macros/s/…/exec"><button class="btn small" id="apiSave" type="button">儲存</button></div>
+    <div class="toast" id="apiMsg"></div>
+  </div>
 
   <div class="a-block">
     <div class="a-title">自動搜尋的縣市</div>
@@ -455,6 +512,7 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
     info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>',
     grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
     list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+    chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
   };
   // 早鳥優惠：e.earlyBird 優先，否則從 perks 找「早鳥／首發／Lv1／折」
   const ebOf = e => e.earlyBird || (e.perks||[]).find(p => /早鳥|首發|Lv\s*1|LV\s*1|early/i.test(p)) || null;
@@ -463,6 +521,7 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
   const iv = (name, text, cls) => { const s = el('span','iv'+(cls?' '+cls:'')); s.append(ic(name), el('span',null,text)); return s; };
   document.querySelectorAll('.vs button[data-ic]').forEach(b => b.prepend(ic(b.dataset.ic)));
   document.querySelectorAll('.sel[data-ic]').forEach(l => l.prepend(ic(l.dataset.ic,'sel-ic')));
+  document.querySelectorAll('.fbbtn[data-ic]').forEach(b => b.prepend(ic(b.dataset.ic)));
 
   function types(e){
     const t = [], txt = (e.name||'')+(e.gtdText||'');
@@ -573,9 +632,9 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
 
   // ---------- status + picks ----------
   function renderStatus(){
-    const box = $('#status'); box.innerHTML='';
-    const vs = venues.filter(v => state.city==='all' || v.city===state.city);
-    if (!vs.length){ box.append(el('span','note', state.city==='all' ? '尚無場館資料' : `${state.city}還沒有場館資料`)); return; }
+    const box = $('#status'); if (!box || $('#admin').hidden) return; box.innerHTML='';
+    const vs = venues.slice().sort((a,b) => (a.city||'').localeCompare(b.city||'') || a.name.localeCompare(b.name));
+    if (!vs.length){ box.append(el('span','note','尚無場館資料')); return; }
     vs.forEach(v => {
       const s = el('span','src'); const d = el('span','dot');
       const age = v.updated ? (Date.now()-new Date(v.updated).getTime())/864e5 : 99;
@@ -656,7 +715,7 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
     const kv = el('span','h-kv');
     const k = (icon, v, label, cls) => { const d = el('span'); d.append(ic(icon), el('b','num'+(cls?' '+cls:''), v), el('small',null,label)); kv.append(d); };
     k('coin', e.buyIn ? '$'+fmt(e.buyIn) : '—', '買入');
-    k('users', c.be ? Math.ceil(c.be)+'' : '—', '保底人數');
+    k('users', c.n ? c.n+'' : '—', c.nSrc==='you' ? '你預估人數' : '預估買入人數');
     k('trophy', e.gtd ? wan(e.gtd) : '—', '保證');
     { const eb = ebShort(e); if (eb) k('gift', eb, '早鳥', 'eb'); else { const rc = regCloseOf(e); k('clock', rc ? hhmm(rc) : '—', '截買'); } }
     h.append(kv);
@@ -872,12 +931,120 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
   (async () => {
     try { db = await window.claude?.use?.('db'); } catch(e){ db = null; }
     if (!db){ db = null; renderList(); return; }
-    editReady.then(v => { canEdit = v; $('#openAdmin').hidden = !v; renderList(); });
+    editReady.then(v => { canEdit = v; $('#openAdmin').hidden = !v; renderList(); if (v) watchAdminData(); });
     db.collection('events').onSnapshot(s => { rawEvents = s.docs.map(d => norm24({ id:d.id, ...d.data() })); recompute(); renderAll(); },
       () => { $('#list').innerHTML=''; $('#list').append(el('div','empty','讀取賽程失敗，請重新整理頁面。')); });
     db.collection('venues').onSnapshot(s => { allVenues = s.docs.map(d => { const v = { id:d.id, ...d.data() }; ['hours','notes'].forEach(k => { if (typeof v[k]==='string') v[k]=to24(v[k]); }); if (Array.isArray(v.rules)) v.rules = v.rules.map(to24); return v; }); recompute(); renderAll(); renderAdmin(); });
-    db.doc('settings/main').onSnapshot(s => { settingsVer = s.exists; settings = s.exists ? { cities: [], ...s.data() } : { cities: [] }; renderAdmin(); });
+    db.doc('settings/main').onSnapshot(s => { settingsVer = s.exists; settings = s.exists ? { cities: [], ...s.data() } : { cities: [] }; setApi(settings.apiUrl); renderAdmin(); });
   })();
+
+
+  // ---------- usage stats + feedback ----------
+  // 公開網站（GitHub Pages）把使用紀錄與回饋送到使用者自己的 Google Apps Script；claude.ai 內的回饋存進 App 資料庫。
+  const PUBLIC = !!window.__RADAR_PUBLIC;
+  const VID = (() => { let v = store.get('vid', null); if (!v){ v = 'v' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); store.set('vid', v); } return v; })();
+  let apiUrl = null, trackQ = [{ t:'visit', ts: Date.now() }], trackTimer = null;
+  const okApi = u => typeof u === 'string' && /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u.trim());
+  function apiPost(body){
+    if (!apiUrl) return false;
+    const data = JSON.stringify(body);
+    try { if (navigator.sendBeacon && navigator.sendBeacon(apiUrl, new Blob([data], { type:'text/plain;charset=utf-8' }))) return true; } catch(e){}
+    try { fetch(apiUrl, { method:'POST', mode:'no-cors', keepalive:true, headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:data }).catch(()=>{}); return true; } catch(e){ return false; }
+  }
+  function flushTrack(){
+    clearTimeout(trackTimer); trackTimer = null;
+    if (!PUBLIC || !apiUrl || !trackQ.length) return;
+    apiPost({ kind:'track', vid: VID, day: dayKey(new Date()), events: trackQ.splice(0, 200) });
+  }
+  function setApi(u){ const next = okApi(u) ? u.trim() : null; if (next === apiUrl) return; apiUrl = next; flushTrack(); }
+  document.addEventListener('click', ev => {
+    const t = ev.target.closest && ev.target.closest('button,summary,a,select,label.sel,input[type=checkbox]');
+    if (!t || t.closest('#admin')) return;
+    const label = (t.getAttribute('aria-label') || t.dataset.v || t.dataset.d || t.textContent || t.id || t.tagName).replace(/\s+/g,' ').trim().slice(0,40);
+    trackQ.push({ t:'click', l: label, ts: Date.now() });
+    if (trackQ.length > 300) trackQ.splice(0, trackQ.length - 300);
+    if (!trackTimer) trackTimer = setTimeout(flushTrack, 5000);
+  }, true);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) flushTrack(); });
+  window.addEventListener('pagehide', flushTrack);
+
+  // feedback sheet
+  let userNs = null; const userReady = (async () => { try { userNs = await window.claude?.use?.('user'); } catch(e){ userNs = null; } return userNs; })();
+  const showFb = v => { $('#fbSheet').hidden = !v; $('#scrim').hidden = !v; if (v){ $('#fbMsg').textContent=''; setTimeout(() => $('#fbText').focus(), 50); } };
+  $('#openFb').onclick = () => showFb(true);
+  $('#openFb2').onclick = () => showFb(true);
+  $('#closeFb').onclick = () => showFb(false);
+  $('#fbSend').onclick = async () => {
+    const text = $('#fbText').value.trim(), contact = $('#fbContact').value.trim();
+    if ($('#fbHp').value) { showFb(false); return; }
+    if (text.length < 2){ $('#fbMsg').textContent = '請先寫下你的想法。'; return; }
+    const last = store.get('fbLast', 0);
+    if (Date.now() - last < 30e3){ $('#fbMsg').textContent = '剛剛已經送出一則，請稍等一下再送。'; return; }
+    const item = { text: text.slice(0,1000), contact: contact.slice(0,100), at: new Date().toISOString() };
+    $('#fbSend').disabled = true;
+    let ok = false;
+    try {
+      if (PUBLIC){
+        if (!apiUrl){ $('#fbMsg').textContent = '回饋功能還在設定中，請稍後再試。'; return; }
+        ok = apiPost({ kind:'feedback', vid: VID, page:'public', ...item });
+      } else {
+        const u = await userReady; const uid = u && await u.id?.();
+        if (!db || !uid){ $('#fbMsg').textContent = '這個檢視無法送出回饋，請改用公開網站的「意見回饋」。'; return; }
+        const ref = db.doc('feedback/' + uid); const snap = await ref.get();
+        const items = (snap.exists ? (snap.data().items || []) : []).slice(-49);
+        await ref.set({ items: [...items, { ...item, page:'app' }] }); ok = true;
+      }
+    } catch(e){ ok = false; }
+    finally { $('#fbSend').disabled = false; }
+    if (ok){ store.set('fbLast', Date.now()); $('#fbText').value=''; $('#fbContact').value=''; $('#fbMsg').textContent = '已送出，謝謝你的回饋！'; }
+    else $('#fbMsg').textContent = '送出失敗，請稍後再試。';
+  };
+
+  // admin: stats, feedback, api settings (admin-only documents under private/ and feedback/)
+  let statsDoc = null, pubFb = [], appFb = [], cfg = {}, adminWatched = false;
+  function watchAdminData(){
+    if (adminWatched || !db || PUBLIC) return; adminWatched = true;
+    const on = (ref, fn) => { try { ref.onSnapshot(fn, () => {}); } catch(e){} };
+    on(db.doc('private/stats'), s => { statsDoc = s.exists ? s.data() : null; renderAdmin(); });
+    on(db.doc('private/fb'), s => { pubFb = s.exists ? (s.data().items || []) : []; renderAdmin(); });
+    on(db.doc('private/config'), s => { cfg = s.exists ? s.data() : {}; renderAdmin(); });
+    on(db.collection('feedback'), s => { appFb = s.docs.flatMap(d => (d.data().items || [])); renderAdmin(); });
+  }
+  const twTime = iso => { try { return new Date(iso).toLocaleString('zh-TW', { timeZone:'Asia/Taipei', month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:false }); } catch(e){ return ''; } };
+  function renderStats(){
+    const k = $('#stKpis'), tb = $('#stTable'); k.innerHTML=''; tb.innerHTML='';
+    const live = $('#stLive');
+    if (apiUrl && cfg.adminKey){ live.href = apiUrl + '?key=' + encodeURIComponent(cfg.adminKey); live.hidden = false; } else live.hidden = true;
+    if (!statsDoc || !(statsDoc.days||[]).length){
+      $('#stNote').textContent = apiUrl ? '還沒有同步到統計資料，明天早上的每日更新後就會出現。' : '還沒設定統計服務：先照說明部署 Google Apps Script，把網址貼到下面「統計服務設定」。';
+      return;
+    }
+    const days = statsDoc.days.slice().sort((a,b) => b.day.localeCompare(a.day));
+    const today = dayKey(new Date()), t = days.find(d => d.day === today) || { users:0, clickers:0, clicks:0 };
+    $('#stNote').textContent = `公開網站統計，${statsDoc.updated ? twTime(statsDoc.updated) + ' 同步' : ''}（從 ${statsDoc.since || days[days.length-1].day} 起算）。`;
+    const kp = (v, label) => { const d = el('div','kpi'); d.append(el('small',null,label), el('b',null, fmt(v))); k.append(d); };
+    kp(t.users, '今日使用人數'); kp(t.clickers, '今日有點擊的人數');
+    kp(statsDoc.totalClicks ?? days.reduce((s,d) => s + (d.clicks||0), 0), '起算至今累計點擊');
+    const tbl = el('table','stbl'); const hr = el('tr'); ['日期','使用人數','點擊人數','點擊次數'].forEach(h => hr.append(el('th',null,h))); tbl.append(hr);
+    days.slice(0,14).forEach(d => { const r = el('tr'); r.append(el('td',null, dayLabel(d.day)), el('td',null,fmt(d.users)), el('td',null,fmt(d.clickers)), el('td',null,fmt(d.clicks))); tbl.append(r); });
+    tb.append(tbl);
+  }
+  function renderFbList(){
+    const box = $('#fbList'); box.innerHTML='';
+    const all = [...pubFb.map(x => ({...x, src: x.page==='app' ? 'App' : '公開網站'})), ...appFb.map(x => ({...x, src:'App'}))]
+      .sort((a,b) => String(b.at||'').localeCompare(String(a.at||'')));
+    if (!all.length){ box.append(el('div','note', '還沒有回饋。公開網站的回饋每天早上同步一次。')); return; }
+    all.slice(0,50).forEach(x => { const d = el('div','fbitem', x.text || ''); d.append(el('div','vm', [twTime(x.at), x.src, x.contact && '聯絡：'+x.contact].filter(Boolean).join('・'))); box.append(d); });
+  }
+  $('#apiSave').onclick = async () => {
+    const u = $('#apiUrl').value.trim();
+    if (u && !okApi(u)){ $('#apiMsg').textContent = '網址格式不對，應該像 https://script.google.com/macros/s/……/exec'; return; }
+    try {
+      if (settingsVer) await db.doc('settings/main').update({ apiUrl: u || null });
+      else await db.doc('settings/main').set({ cities: settings.cities || [], apiUrl: u || null });
+      $('#apiMsg').textContent = u ? '已儲存。下次公開網站更新後就會開始記錄。' : '已清除。';
+    } catch(e){ $('#apiMsg').textContent = errMsg(e); }
+  };
 
   // ---------- admin ----------
   const showAdmin = v => { $('#admin').hidden = !v; $('#scrim').hidden = !v; if (v) renderAdmin(); };
@@ -892,6 +1059,8 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
   }
   function renderAdmin(){
     if ($('#admin').hidden) return;
+    renderStatus(); renderStats(); renderFbList();
+    if (document.activeElement !== $('#apiUrl')) $('#apiUrl').value = settings.apiUrl || '';
     const cc = $('#cityChips'); cc.innerHTML='';
     (settings.cities||[]).forEach(c => {
       const ch = el('span','cchip',c); const x = el('button',null,'×'); x.type='button'; x.setAttribute('aria-label','移除 '+c);
@@ -950,7 +1119,7 @@ details.fold>summary .ic{color:var(--gold);width:17px;height:17px}
   const showSheet = v => { $('#sheet').hidden = !v; $('#scrim').hidden = !v; };
   $('#fab').onclick = () => showSheet(true);
   $('#closeSheet').onclick = () => showSheet(false);
-  $('#scrim').onclick = () => { showSheet(false); $('#admin').hidden = true; };
+  $('#scrim').onclick = () => { showSheet(false); $('#admin').hidden = true; $('#fbSheet').hidden = true; };
   (async () => {
     try { sample = await window.claude?.use?.('sample'); } catch(e){ sample = null; }
     if (!sample || !(await editReady)){ $('#fab').hidden = true; return; }
@@ -1014,3 +1183,7 @@ uncertain: 看不清楚或不確定的地方，用中文短句列出；確定就
   };
 })();
 </script>
+
+
+
+</body></html>
